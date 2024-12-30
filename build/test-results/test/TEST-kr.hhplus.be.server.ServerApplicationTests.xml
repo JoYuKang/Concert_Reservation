@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="kr.hhplus.be.server.ServerApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-12-26T15:42:16" hostname="hubtwork-Macbook.local" time="1.28">
+  <properties/>
+  <testcase name="contextLoads()" classname="kr.hhplus.be.server.ServerApplicationTests" time="1.28"/>
+  <system-out><![CDATA[15:42:07.531 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [kr.hhplus.be.server.ServerApplicationTests]: ServerApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:42:07.598 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration kr.hhplus.be.server.ServerApplication for test class kr.hhplus.be.server.ServerApplicationTests
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.1)
+
+2024-12-26T15:42:07.798Z  INFO 43656 --- [hhplus] [    Test worker] k.h.be.server.ServerApplicationTests     : Starting ServerApplicationTests using Java 21.0.5 with PID 43656 (started by heojae in /Users/heojae/Desktop/repo-content/server-java)
+2024-12-26T15:42:07.799Z  INFO 43656 --- [hhplus] [    Test worker] k.h.be.server.ServerApplicationTests     : The following 1 profile is active: "local"
+2024-12-26T15:42:08.060Z  INFO 43656 --- [hhplus] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-12-26T15:42:08.067Z  INFO 43656 --- [hhplus] [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 JPA repository interfaces.
+2024-12-26T15:42:08.295Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.images.PullPolicy     : Image pull policy will be performed by: DefaultPullPolicy()
+2024-12-26T15:42:08.296Z  INFO 43656 --- [hhplus] [    Test worker] o.t.utility.ImageNameSubstitutor         : Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+2024-12-26T15:42:08.302Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.DockerClientFactory   : Testcontainers version: 1.20.4
+2024-12-26T15:42:08.396Z  INFO 43656 --- [hhplus] [    Test worker] o.t.d.DockerClientProviderStrategy       : Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+2024-12-26T15:42:08.541Z  INFO 43656 --- [hhplus] [    Test worker] o.t.d.DockerClientProviderStrategy       : Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+2024-12-26T15:42:08.542Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.DockerClientFactory   : Docker host IP address is localhost
+2024-12-26T15:42:08.557Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.DockerClientFactory   : Connected to docker: 
+  Server Version: 27.3.1
+  API Version: 1.47
+  Operating System: OrbStack
+  Total Memory: 16032 MB
+2024-12-26T15:42:08.577Z  INFO 43656 --- [hhplus] [    Test worker] tc.testcontainers/ryuk:0.11.0            : Creating container for image: testcontainers/ryuk:0.11.0
+2024-12-26T15:42:08.619Z  INFO 43656 --- [hhplus] [    Test worker] o.t.utility.RegistryAuthLocator          : Credential helper/store (docker-credential-osxkeychain) does not have credentials for https://index.docker.io/v1/
+2024-12-26T15:42:08.701Z  INFO 43656 --- [hhplus] [    Test worker] tc.testcontainers/ryuk:0.11.0            : Container testcontainers/ryuk:0.11.0 is starting: adc3c97f4d02c6a3231040cf202bea2e467378d0bbad8a2b0db67db629fa575f
+2024-12-26T15:42:08.909Z  INFO 43656 --- [hhplus] [    Test worker] tc.testcontainers/ryuk:0.11.0            : Container testcontainers/ryuk:0.11.0 started in PT0.332156S
+2024-12-26T15:42:08.915Z  INFO 43656 --- [hhplus] [    Test worker] o.t.utility.RyukResourceReaper           : Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+2024-12-26T15:42:08.916Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.DockerClientFactory   : Checking the system...
+2024-12-26T15:42:08.916Z  INFO 43656 --- [hhplus] [    Test worker] org.testcontainers.DockerClientFactory   : ✔︎ Docker server version should be at least 1.6.0
+2024-12-26T15:42:08.917Z  INFO 43656 --- [hhplus] [    Test worker] tc.mysql:8.0                             : Creating container for image: mysql:8.0
+2024-12-26T15:42:08.980Z  INFO 43656 --- [hhplus] [    Test worker] tc.mysql:8.0                             : Container mysql:8.0 is starting: aa6a237d2b9af71dcd9fb00b204c0ab1b280db257a83a26193034cfbe9fb9625
+2024-12-26T15:42:09.095Z  INFO 43656 --- [hhplus] [    Test worker] tc.mysql:8.0                             : Waiting for database connection to become available at jdbc:mysql://localhost:32775/hhplus using query 'SELECT 1'
+2024-12-26T15:42:15.172Z  INFO 43656 --- [hhplus] [    Test worker] tc.mysql:8.0                             : Container mysql:8.0 started in PT6.254293S
+2024-12-26T15:42:15.172Z  INFO 43656 --- [hhplus] [    Test worker] tc.mysql:8.0                             : Container is started (JDBC URL: jdbc:mysql://localhost:32775/hhplus)
+2024-12-26T15:42:15.530Z  INFO 43656 --- [hhplus] [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-12-26T15:42:15.565Z  INFO 43656 --- [hhplus] [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.4.Final
+2024-12-26T15:42:15.583Z  INFO 43656 --- [hhplus] [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2024-12-26T15:42:15.735Z  INFO 43656 --- [hhplus] [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-12-26T15:42:15.750Z  INFO 43656 --- [hhplus] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HangHaePlusDataSource - Starting...
+2024-12-26T15:42:15.841Z  INFO 43656 --- [hhplus] [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HangHaePlusDataSource - Added connection com.mysql.cj.jdbc.ConnectionImpl@7988fd6e
+2024-12-26T15:42:15.844Z  INFO 43656 --- [hhplus] [    Test worker] com.zaxxer.hikari.HikariDataSource       : HangHaePlusDataSource - Start completed.
+2024-12-26T15:42:15.904Z  INFO 43656 --- [hhplus] [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HangHaePlusDataSource)']
+	Database driver: undefined/unknown
+	Database version: 8.0.40
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2024-12-26T15:42:16.078Z  INFO 43656 --- [hhplus] [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2024-12-26T15:42:16.082Z  INFO 43656 --- [hhplus] [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-12-26T15:42:16.679Z  INFO 43656 --- [hhplus] [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2024-12-26T15:42:16.724Z  INFO 43656 --- [hhplus] [    Test worker] k.h.be.server.ServerApplicationTests     : Started ServerApplicationTests in 9.06 seconds (process running for 10.298)
+]]></system-out>
+  <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/Users/heojae/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.15.11/a38b16385e867f59a641330f0362ebe742788ed8/byte-buddy-agent-1.15.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
