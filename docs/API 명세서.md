@@ -11,7 +11,7 @@
 
 ## 개요
 ### 향 후 Id값을 Headers 넣어서 사용하도록 수정 예정
-### 유저의 예약 내역 조회 API
+### 유저의 예약 내역 조회
 - **URL:** `/members/{id}/reservations`
 - **Method:** `GET`
 - **URL Params:**
@@ -150,16 +150,17 @@
     ```
 
 ### 좌석 예약 요청
-- **URL:** `/concerts/{concertId}/seats/{seatId}/reservations`
+- **URL:** `/members/{id}/reservations`
 - **Method:** `POST`
 - **URL Params:**
-    - `concertId=[integer]` (required) 콘서트 고유값
-    - `seatId=[integer]` (required) 좌석 고유값
+    - None
 - **Request Body:**
     - **Content:**
     ```json
     {
-      "userId": 1
+      "userId": 1,
+      "concertId": 3,
+      "seatId": 15
     }
     ```
 - **Success Response:**
@@ -189,15 +190,16 @@
     ```
 
 ### 예약한 좌석의 결제 요청
-- **URL:** `/reservations/{reservationId}/payments`
+- **URL:** `/members/{id}/reservations/payments`
 - **Method:** `POST`
 - **URL Params:**
-    - `reservationId=[integer]` (required) 예약 고유값
+    - None
 - **Request Body:**
     - **Content:**
     ```json
     {
-      "userId": 1
+      "userId": 1,
+      "reservationId": 3
     }
     ```
 - **Success Response:**
@@ -206,9 +208,9 @@
     ```json
     {
       "concert_name": "Winter Concert",
-      "amount": 50000
+      "amount": 50000,
       "seat_number": 15,
-      "status": "Complete",
+      "status": "Complete"
     }
     ```
 - **Error Response:**
