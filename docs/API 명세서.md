@@ -1,6 +1,7 @@
 # API 명세서
 
 ## API 목차
+- [유저 토큰 발급](#유저-토큰-발급)
 - [유저의 예약 내역 조회](#유저의-예약-내역-조회)
 - [유저의 잔고 조회](#유저의-잔고-조회)
 - [유저의 충전 요청](#유저의-충전-요청)
@@ -11,6 +12,36 @@
 
 ## 개요
 ### 향 후 Id값을 Headers 넣어서 사용하도록 수정 예정
+
+### 유저 토큰 발급
+- **URL:** `/tokens`
+- **Method:** `POST`
+- **URL Params:**
+    - None
+- **Request Body:**
+    - **Content:**
+    ```json
+    {
+      "memberId": 11  
+   }
+    ```
+- **Success Response:**
+    - **Code:** 201 OK
+    - **Content:**
+    ```json
+    {
+      "tokenId": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+    }
+    ```
+- **Error Response:**
+    - **Code:** 400 Bad Request
+    - **Content:**
+    ```json
+    {
+      "error": "유저를 찾을 수 없습니다."
+    }
+    ```
+
 ### 유저의 예약 내역 조회
 - **URL:** `/members/{id}/reservations`
 - **Method:** `GET`
