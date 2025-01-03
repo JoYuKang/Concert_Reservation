@@ -189,7 +189,6 @@
     - **Content:**
     ```json
     {
-      "userId": 1,
       "concertId": 3,
       "seatId": 15
     }
@@ -229,7 +228,6 @@
     - **Content:**
     ```json
     {
-      "userId": 1,
       "reservationId": 3
     }
     ```
