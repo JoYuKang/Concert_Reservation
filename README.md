@@ -16,7 +16,7 @@
 - 대기열 개념을 고려해 구현
 ### [Milestone](https://github.com/users/JoYuKang/projects/5)
 ### [Sequence Diagram](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/%EC%8B%9C%ED%80%80%EC%8A%A4%20%EB%8B%A4%EC%9D%B4%EC%96%B4%EA%B7%B8%EB%9E%A8.md)
-### [ERD](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/ERD.md)
+### [ERD](https://github.com/JoYuKang/Concert_Reservation/blob/main/docs/ERD.md)
 ### [API 명세서](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/API%20%EB%AA%85%EC%84%B8%EC%84%9C.md)
 ### [플로우차트](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/%ED%94%8C%EB%A1%9C%EC%9A%B0%20%EC%B0%A8%ED%8A%B8.md)
 ## 페키지 구조
