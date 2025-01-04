@@ -32,6 +32,7 @@ erDiagram
         Long concert_id FK
         Int position
         Int amount
+        Enum status
     }
     BALANCE_HISTORY {
         Long id PK
@@ -42,5 +43,6 @@ erDiagram
 
     MEMBER ||--o| RESERVATION : has
     CONCERT ||--o| RESERVATION : hosts
+    SEAT ||--o| CONCERT : has
     SEAT ||--o| RESERVATION : is_reserved
     MEMBER ||--o| BALANCE_HISTORY : has
