@@ -2,23 +2,27 @@
 
 ```mermaid
 erDiagram
-    MEMBER {
+    Member {
         Long id PK
-        Varchar name
+        Varchar(255) name
         Int balance
     }
-    TOKEN {
-        UUID id PK
+
+    Token {
+        Long id PK
+        Varchar(255) UUID 
         Enum status
         Timestamp created_at
         Timestamp expired_at
     }
-    CONCERT {
+
+    Concert {
         Long id PK
-        Varchar name
+        Varchar(255) name
         Date date
     }
-    RESERVATION {
+
+    Reservation {
         Long id PK
         Long user_id FK
         Long concert_id FK
@@ -27,22 +31,35 @@ erDiagram
         Enum status
         Timestamp created_at
     }
-    SEAT {
+
+    Seat {
         Long id PK
         Long concert_id FK
         Int position
         Int amount
         Enum status
     }
-    BALANCE_HISTORY {
+
+    Balance_History {
         Long id PK
         Long user_id FK
         Int amount
         Timestamp created_at
     }
 
-    MEMBER ||--o| RESERVATION : has
-    CONCERT ||--o| RESERVATION : hosts
-    SEAT ||--o| CONCERT : has
-    SEAT ||--o| RESERVATION : is_reserved
-    MEMBER ||--o| BALANCE_HISTORY : has
+    Payment {
+        Long id PK
+        Long reservation_id FK
+        Int amount
+        Varchar(255) status
+        Timestamp created_at
+    }
+
+    Member ||--o{ Reservation : "has"
+    Concert ||--o{ Reservation : "has"
+    Seat ||--o{ Reservation : "is booked for"
+    Member ||--o{ Balance_History : "has"
+    Reservation ||--o{ Payment : "is paid with"
+    Concert ||--o{ Seat : "has"
+
+```
