@@ -36,7 +36,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.projectlombok:lombok")
-	implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")

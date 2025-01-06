@@ -22,4 +22,13 @@ public class Member extends Timestamped {
 
     private Integer balance;
 
+    public void chargeBalance(int amount) {
+        balance += amount;
+    }
+
+    public void reduceBalance(int amount) {
+        balance -= amount;
+        if (balance < 0) throw new IllegalArgumentException();
+    }
+
 }
