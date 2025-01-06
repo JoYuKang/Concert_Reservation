@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -21,6 +21,6 @@ public class Concert extends Timestamped {
 
     private String title;
 
-    private Date concertDate;
+    private LocalDate concertDate;
 
 }
