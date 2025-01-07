@@ -54,6 +54,7 @@ class ConcertServiceTest {
     }
 
     @Test
+    @DisplayName("콘서트 Id로 콘서트를 조회한다.")
     void getById() {
         // given
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());

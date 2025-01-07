@@ -22,13 +22,13 @@ public class ConcertController {
     // 콘서트 일자 조회
     @GetMapping("/date/{date}")
     public ResponseEntity<List<ConcertResponse>> getConcerts(
-            @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date ) {
+            @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date ) {
         return new ResponseEntity<>(concertService.findByDate(date).stream().map(ConcertResponse::new).collect(Collectors.toList()), HttpStatus.OK);
     }
 
     // 콘서트 이름 조회
     @GetMapping("/title/{title}")
-    public ResponseEntity<List<ConcertResponse>> getConcertTitle(@PathVariable String title ) {
+    public ResponseEntity<List<ConcertResponse>> getConcertTitle(@PathVariable("title") String title ) {
         return new ResponseEntity<>(concertService.findByTitle(title).stream().map(ConcertResponse::new).collect(Collectors.toList()), HttpStatus.OK);
     }
 

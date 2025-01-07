@@ -26,6 +26,7 @@ public class ConcertServiceImpl implements ConcertService {
     }
     @Override
     public Concert getById(Long id) {
+        if (id < 1) throw new IllegalArgumentException("잘못된 Concert ID 값 입니다.");
         return concertJpaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 콘서트가 존재하지 않습니다."));
     }
 }

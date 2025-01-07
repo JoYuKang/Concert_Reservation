@@ -16,6 +16,7 @@ import java.time.LocalDate;
 public class Concert extends Timestamped {
 
     @Id
+    @Column(name = "concert_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

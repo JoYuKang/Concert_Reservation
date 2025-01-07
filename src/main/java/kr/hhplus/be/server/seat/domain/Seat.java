@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.seat.domain;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.concert.domain.Concert;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,9 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "concert_id", nullable = false)
-    private Long concertId;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "concert_id", nullable = false)
+    private Concert concert;
 
     @Column(name = "position")
     private Integer seatNumber;
