@@ -12,10 +12,6 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    // 토큰 조회
-
-    // 토큰 생성
-
-    // 토큰 만료
+    // 토큰 발급
 
 }

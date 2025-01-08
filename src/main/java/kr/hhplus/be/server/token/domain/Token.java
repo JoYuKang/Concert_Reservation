@@ -19,7 +19,20 @@ public class Token {
 
     private String tokenId;
 
+    @Enumerated(EnumType.STRING)
+    private TokenStatus status;
+
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createTime;
 
+    @Column(name = "expired_at")
     private LocalDateTime expireTime;
+
+    public Token(String tokenId, TokenStatus status, LocalDateTime createTime, LocalDateTime expireTime) {
+        this.tokenId = tokenId;
+        this.status = status;
+        this.createTime = createTime;
+        this.expireTime = expireTime;
+    }
+
 }
