@@ -1,17 +1,24 @@
 package kr.hhplus.be.server.payment.interfaces;
 
-import kr.hhplus.be.server.payment.domain.PaymentService;
+import kr.hhplus.be.server.payment.application.facade.PaymentFacade;
+import kr.hhplus.be.server.payment.domain.Payment;
+import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
+import kr.hhplus.be.server.payment.interfaces.response.PaymentResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PaymentFacade paymentFacade;
 
     // 예약 금액 지불
-
+    @PostMapping("/{id}/reservations/payments")
+    public ResponseEntity<PaymentResponse> reservationPayment(@PathVariable("id") Long id, @RequestBody PaymentRequest request) {
+        return new ResponseEntity<>(new PaymentResponse(paymentFacade.createPayment(id, request)), HttpStatus.OK);
+    }
 }

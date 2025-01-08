@@ -2,7 +2,6 @@ package kr.hhplus.be.server.member.domain;
 
 import kr.hhplus.be.server.member.interfaces.dto.request.MemberRequest;
 
-import java.util.Optional;
 
 public interface MemberService {
 

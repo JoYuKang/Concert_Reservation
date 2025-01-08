@@ -39,6 +39,12 @@ public class ReservationServiceImpl implements ReservationService {
         return reservationRepository.save( reservation.updateStatus(ReservationStatus.취소));
     }
 
+    @Override
+    public Reservation getReservationById(Long id) {
+        if (id < 1) throw new RuntimeException();
+        return reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+    }
+
     private Reservation findById(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));

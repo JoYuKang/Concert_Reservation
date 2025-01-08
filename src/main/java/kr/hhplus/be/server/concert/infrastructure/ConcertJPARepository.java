@@ -14,6 +14,4 @@ public interface ConcertJpaRepository extends JpaRepository<Concert, Long> {
 
     List<Concert> findByConcertDate(LocalDate date);
 
-    Optional<Concert> findById(Long id);
-
 }

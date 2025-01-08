@@ -11,4 +11,6 @@ public interface ReservationService {
     Reservation confirmReservation(Long id);
 
     Reservation cancelReservation(Long id);
+
+    Reservation getReservationById(Long id);
 }
