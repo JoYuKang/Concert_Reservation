@@ -65,6 +65,12 @@ public class ReservationFacade {
                 .filter(seat -> requestedSeatNumbers.contains(seat.getSeatNumber()))
                 .toList();
 
+        // 좌석 상태 변경
+        for (Seat selectedSeat : selectedSeats) {
+            selectedSeat.reserve();
+        }
+        seatService.saveSeatAll(selectedSeats);
+
         // 예약 확인
         Reservation reservation = new Reservation(member, concert, selectedSeats);
 
