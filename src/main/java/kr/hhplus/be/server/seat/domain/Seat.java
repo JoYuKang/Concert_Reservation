@@ -28,13 +28,4 @@ public class Seat {
 
     @Enumerated(EnumType.STRING)
     private SeatStatus status;
-
-    public void reserve() {
-        this.status = SeatStatus.매진;
-    }
-
-    public void cancle() {
-        this.status = SeatStatus.판매중;
-    }
-
 }

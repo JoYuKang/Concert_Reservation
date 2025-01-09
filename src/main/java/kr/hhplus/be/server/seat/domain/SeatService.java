@@ -8,6 +8,4 @@ public interface SeatService {
 
     List<Seat> getSeats(Concert concert);
 
-    List<Seat>  saveSeatAll(List<Seat> seats);
-
 }
