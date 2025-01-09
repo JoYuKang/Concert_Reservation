@@ -22,4 +22,9 @@ public class SeatServiceImpl implements SeatService {
         return seatJpaRepository.findByConcertIdAndStatus(concert, SeatStatus.판매중);
     }
 
+    @Override
+    public List<Seat> saveSeatAll(List<Seat> seats) {
+        return seatJpaRepository.saveAll(seats);
+    }
+
 }
