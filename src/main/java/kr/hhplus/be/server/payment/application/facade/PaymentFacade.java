@@ -1,6 +1,9 @@
 package kr.hhplus.be.server.payment.application.facade;
 
 import jakarta.transaction.Transactional;
+import kr.hhplus.be.server.balanceHistory.domain.BalanceHistory;
+import kr.hhplus.be.server.balanceHistory.domain.BalanceHistoryService;
+import kr.hhplus.be.server.balanceHistory.domain.BalanceStatus;
 import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.payment.domain.Payment;
@@ -13,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ public class PaymentFacade {
 
     private final MemberService memberService;
 
+    private final BalanceHistoryService balanceHistoryService;
+
     @Transactional
     public Payment createPayment(Long memberId, PaymentRequest request) {
 
@@ -32,14 +38,24 @@ public class PaymentFacade {
 
         // 요청 맴버와 예약의 맴버 일치 확인
         Member member = memberService.findById(memberId);
-        if (member.getId() != reservation.getMember().getId()) {
+        if (!Objects.equals(member.getId(), reservation.getMember().getId())) {
             throw new RuntimeException("예약자와 다른 유저입니다.");
+        }
+        // 예약 금액 맴버 잔고 비교 차감
+        if (member.getBalance() < reservation.getTotalAmount()) {
+            throw new IllegalArgumentException("금액이 부족합니다.");
         }
 
         // 예약 유효성 확인
         if (reservation.getCreateTime().isBefore(LocalDateTime.now().minusMinutes(5))) {
             throw new RuntimeException("유효한 시간이 아닌 예약입니다.");
         }
+
+        // 맴버 잔액 차감
+        memberService.reduceBalance(memberId, reservation.getTotalAmount());
+
+        // 맴버 잔액 기록 저장
+        balanceHistoryService.insertHistory(member, reservation.getTotalAmount(), BalanceStatus.사용);
 
         // 결제 내역 저장
         Payment payment = paymentService.create(new Payment(reservation.getMember(), reservation, reservation.getTotalAmount(), PaymentStatus.완료));
