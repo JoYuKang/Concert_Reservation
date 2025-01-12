@@ -1,7 +1,6 @@
 package kr.hhplus.be.server.payment.interfaces;
 
 import kr.hhplus.be.server.payment.application.facade.PaymentFacade;
-import kr.hhplus.be.server.payment.domain.Payment;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
 import kr.hhplus.be.server.payment.interfaces.response.PaymentResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class PaymentController {
 
     // 예약 금액 지불
     @PostMapping("/{id}/reservations/payments")
-    public ResponseEntity<PaymentResponse> reservationPayment(@PathVariable("id") Long id, @RequestBody PaymentRequest request) {
-        return new ResponseEntity<>(new PaymentResponse(paymentFacade.createPayment(id, request)), HttpStatus.OK);
+    public ResponseEntity<PaymentResponse> reservationPayment(@PathVariable("id") Long id, @RequestBody PaymentRequest request, @RequestHeader(value = "Token") String token) {
+        return new ResponseEntity<>(new PaymentResponse(paymentFacade.createPayment(id, request, token)), HttpStatus.OK);
     }
 }

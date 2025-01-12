@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Token {
     @Id
+    @Column(name = "token_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -23,8 +24,10 @@ public class Token {
     @Enumerated(EnumType.STRING)
     private TokenStatus status;
 
+    @Column(name = "create_at")
     private LocalDateTime createTime;
 
+    @Column(name = "expire_at")
     private LocalDateTime expireTime;
 
     public Token(String token) {
@@ -43,6 +46,7 @@ public class Token {
         if (this.status == TokenStatus.EXPIRED) {
             throw new IllegalStateException("이미 만료된 토큰입니다.");
         }
+        this.expireTime = LocalDateTime.now().plusMinutes(30);
         this.status = TokenStatus.ACTIVE;
     }
 

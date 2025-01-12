@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class Payment extends Timestamped {
 
     @Id
+    @Column(name = "payment_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -30,7 +31,7 @@ public class Payment extends Timestamped {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus status; // 완료, 취소
 
     public Payment(Member member, Reservation reservation, Integer amount, PaymentStatus status) {
         this.member = member;

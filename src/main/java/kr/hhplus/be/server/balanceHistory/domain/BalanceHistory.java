@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class BalanceHistory extends Timestamped {
 
     @Id
+    @Column(name = "balance_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,7 +26,7 @@ public class BalanceHistory extends Timestamped {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private BalanceStatus status;
+    private BalanceStatus status; // 충전, 사용
 
     public BalanceHistory(Member member, Integer amount, BalanceStatus status) {
         this.memberId = member;

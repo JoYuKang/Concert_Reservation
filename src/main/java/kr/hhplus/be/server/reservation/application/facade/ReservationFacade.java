@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,15 +36,15 @@ public class ReservationFacade {
     }
 
     // 좌석 예약
-    public Reservation createReservation(Long memberId, ReservationRequest request) {
+    public Reservation createReservation(ReservationRequest request) {
 
         // member 확인
-        Member member = memberService.findById(memberId);
+        Member member = memberService.findById(request.getMemberId());
 
         // concert 확인
         Concert concert = concertService.getById(request.getConcertId());
 
-        //  판매중인 Seat 확인
+        // 판매중인 Seat 확인
         List<Seat> availableSeats = seatService.getSeats(concert);
 
         // 요청된 좌석 번호

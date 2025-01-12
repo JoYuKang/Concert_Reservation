@@ -7,6 +7,8 @@ import java.util.List;
 @Getter
 public class ReservationRequest {
 
+    private Long memberId;
+
     private Long concertId;
 
     private List<Integer> seatNumbers;

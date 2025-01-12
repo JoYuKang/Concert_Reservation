@@ -12,6 +12,7 @@ import kr.hhplus.be.server.payment.domain.PaymentStatus;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
 import kr.hhplus.be.server.reservation.domain.Reservation;
 import kr.hhplus.be.server.reservation.domain.ReservationService;
+import kr.hhplus.be.server.token.domain.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +31,10 @@ public class PaymentFacade {
 
     private final BalanceHistoryService balanceHistoryService;
 
+    private final TokenService tokenService;
+
     @Transactional
-    public Payment createPayment(Long memberId, PaymentRequest request) {
+    public Payment createPayment(Long memberId, PaymentRequest request, String token) {
 
         // 예약 확인
         Reservation reservation = reservationService.getReservationById(request.getReservationId());
@@ -41,10 +44,6 @@ public class PaymentFacade {
         if (!Objects.equals(member.getId(), reservation.getMember().getId())) {
             throw new RuntimeException("예약자와 다른 유저입니다.");
         }
-        // 예약 금액 맴버 잔고 비교 차감
-        if (member.getBalance() < reservation.getTotalAmount()) {
-            throw new IllegalArgumentException("금액이 부족합니다.");
-        }
 
         // 예약 유효성 확인
         if (reservation.getCreateTime().isBefore(LocalDateTime.now().minusMinutes(5))) {
@@ -52,16 +51,19 @@ public class PaymentFacade {
         }
 
         // 맴버 잔액 차감
-        memberService.reduceBalance(memberId, reservation.getTotalAmount());
+        Member reduceMember = memberService.reduceBalance(memberId, reservation.getTotalAmount());
 
         // 맴버 잔액 기록 저장
-        balanceHistoryService.insertHistory(member, reservation.getTotalAmount(), BalanceStatus.사용);
+        balanceHistoryService.insertHistory(reduceMember, reservation.getTotalAmount(), BalanceStatus.사용);
 
         // 결제 내역 저장
         Payment payment = paymentService.create(new Payment(reservation.getMember(), reservation, reservation.getTotalAmount(), PaymentStatus.완료));
 
         // 예약 업데이트
         reservationService.confirmReservation(reservation.getId());
+
+        // 토큰 만료
+        tokenService.expire(token);
 
         return payment;
     }

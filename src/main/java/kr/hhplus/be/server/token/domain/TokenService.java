@@ -6,7 +6,7 @@ public interface TokenService {
 
     Token get(String token);
 
-    Token create();
+    String create();
 
     List<Token> active(List<Token> tokens);
 

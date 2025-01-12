@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.config.web;
+package kr.hhplus.be.server.support.config.web;
 
 import kr.hhplus.be.server.support.interceptor.TokenValidationInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +15,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenValidationInterceptor)
-                .addPathPatterns("/concert")
-                .addPathPatterns("/members/*/reservations");
+                .addPathPatterns("/concerts/**")
+                .addPathPatterns("/reservations");
     }
 
 }

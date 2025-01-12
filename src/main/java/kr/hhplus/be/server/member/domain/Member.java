@@ -16,6 +16,7 @@ public class Member extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
     private Long id;
 
     @Column(nullable = false)
@@ -29,7 +30,7 @@ public class Member extends Timestamped {
     }
 
     public void reduceBalance(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new IllegalArgumentException("금액이 부족합니다.");
         balance -= amount;
         if (balance < 0) throw new IllegalArgumentException();
     }

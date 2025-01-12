@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Seat {
 
     @Id
+    @Column(name = "seat_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,7 +28,7 @@ public class Seat {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private SeatStatus status;
+    private SeatStatus status; // 판매중, 매진
 
     public void reserve() {
         this.status = SeatStatus.매진;

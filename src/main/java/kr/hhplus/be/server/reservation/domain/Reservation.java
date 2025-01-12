@@ -21,6 +21,7 @@ import java.util.List;
 public class Reservation extends Timestamped {
 
     @Id
+    @Column(name = "reservation_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,6 +33,7 @@ public class Reservation extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     private Concert concert;
 
+    @Column(name = "seat_id")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "reservation_id", nullable = false)
     private List<Seat> seats = new ArrayList<>();
@@ -40,7 +42,7 @@ public class Reservation extends Timestamped {
     private Integer totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    private ReservationStatus status; // 확정, 취소, 결제대기
 
     public Reservation updateStatus(ReservationStatus status) {
         if (this.status != ReservationStatus.결제대기) throw new IllegalArgumentException("결제할 수 있는 상태가 아닙니다.");

@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/members")
+@RequestMapping("/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
 
     private final ReservationFacade reservationFacade;
 
     // 유저의 예약 조회
-    @GetMapping("/{id}/reservations")
+    @GetMapping("/{id}")
     public ResponseEntity<List<ReservationResponse>> getMemberReservations(@PathVariable("id") Long memberId) {
         return new ResponseEntity<>(reservationFacade.findMemberReservation(memberId).stream()
                 .map(ReservationResponse::new)
@@ -29,9 +29,9 @@ public class ReservationController {
     }
 
     // 예약 신청
-    @PostMapping("/{id}/reservations")
-    public ResponseEntity<ReservationResponse> addReReservation(@PathVariable("id") Long memberId, @RequestBody ReservationRequest request) {
-        return new ResponseEntity<>(new ReservationResponse(reservationFacade.createReservation(memberId, request)), HttpStatus.CREATED);
+    @PostMapping()
+    public ResponseEntity<ReservationResponse> addReReservation(@RequestBody ReservationRequest request) {
+        return new ResponseEntity<>(new ReservationResponse(reservationFacade.createReservation(request)), HttpStatus.CREATED);
     }
 
 }

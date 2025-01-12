@@ -23,8 +23,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Token create() {
-        return tokenJpaRepository.save(new Token(UUID.randomUUID().toString()));
+    public String create() {
+        return tokenJpaRepository.save(new Token(UUID.randomUUID().toString())).getToken();
     }
 
     @Override
