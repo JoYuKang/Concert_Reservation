@@ -30,17 +30,19 @@ src/
 │   ├── common/ 
 │          └── entity/                 # 공통 엔티티
 │   ├── exception/                     # 예외 관리
+│   ├── config/
+│   │   ├── jpa/
+│   │   ├── web/
+│   ├── interceptor
 │   ├──    http/                       # 유틸리티
 │            └─ CommonResponse.java 
 ├── member/                   
 │   ├── domain/
 │   │   ├── Member.java.                 # Member 엔티티
-│   │   ├── memberService.java.          # Member Interface
+│   │   ├── memberService.java.          # Member 서비스 구현체
+│   │   ├── MemberRepository.java.       # Member Interface   
 │   ├── application
 │   │   ├── facade
-│   │   │   ├── MemberFacade.java        # 비지니스 로직 구현
-│   │   ├── service
-│   │   │   ├── MemberServiceImpl.java   # Member Service 구현체
 │   ├── interfaces/ 
 │   │   ├── MemberController.java
 │   │   ├── dto
@@ -60,13 +62,13 @@ src/
 ![image](https://github.com/user-attachments/assets/a2d9a3f5-7319-48bb-a47c-546e5f02e83f)
 
 ### 유저의 예약 요청 API
-![image](https://github.com/user-attachments/assets/81a3224c-6779-4bf3-9bac-4e5a8b66ef91)
+![image](https://github.com/user-attachments/assets/0fe754f4-9ed5-4207-a2bf-554f782ad82a)
 
 ### 유저의 예약 결제 요청 API
 ![image](https://github.com/user-attachments/assets/bf359647-3607-4e0c-9e09-3aa62790b14a)
 
 ### 유저의 예약 내역 조회 API
-![image](https://github.com/user-attachments/assets/75ece074-f46f-4069-b50f-0ea6e687d5a2)
+![image](https://github.com/user-attachments/assets/bf301d58-2ac5-418e-ab90-aaf46a4b7d72)
 
 ### 콘서트 이름 조회 API
 ![image](https://github.com/user-attachments/assets/d6222461-fbdc-4eb6-840c-a834b08913d8)
