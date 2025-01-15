@@ -8,6 +8,7 @@ public interface SeatService {
 
     List<Seat> getSeats(Concert concert);
 
-    List<Seat>  saveSeatAll(List<Seat> seats);
+    void saveSeatAll(List<Seat> seats);
 
+    List<Seat> searchSeatWithLock(Long concertId, List<Integer> seatNumbers);
 }
