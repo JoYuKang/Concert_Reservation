@@ -12,6 +12,9 @@ import kr.hhplus.be.server.payment.domain.PaymentStatus;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
 import kr.hhplus.be.server.reservation.domain.Reservation;
 import kr.hhplus.be.server.reservation.domain.ReservationService;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.ExpiredException;
+import kr.hhplus.be.server.support.exception.UnauthorizedReservationException;
 import kr.hhplus.be.server.token.domain.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,22 +45,22 @@ public class PaymentFacade {
         // 요청 맴버와 예약의 맴버 일치 확인
         Member member = memberService.findById(memberId);
         if (!Objects.equals(member.getId(), reservation.getMember().getId())) {
-            throw new RuntimeException("예약자와 다른 유저입니다.");
+            throw new UnauthorizedReservationException(ErrorMessages.UNAUTHORIZED_RESERVATION);
         }
 
         // 예약 유효성 확인
         if (reservation.getCreateTime().isBefore(LocalDateTime.now().minusMinutes(5))) {
-            throw new RuntimeException("유효한 시간이 아닌 예약입니다.");
+            throw new ExpiredException(ErrorMessages.RESERVATION_EXPIRED);
         }
 
         // 맴버 잔액 차감
         Member reduceMember = memberService.reduceBalance(memberId, reservation.getTotalAmount());
 
         // 맴버 잔액 기록 저장
-        balanceHistoryService.insertHistory(reduceMember, reservation.getTotalAmount(), BalanceStatus.사용);
+        balanceHistoryService.insertHistory(reduceMember, reservation.getTotalAmount(), BalanceStatus.USE);
 
         // 결제 내역 저장
-        Payment payment = paymentService.create(new Payment(reservation.getMember(), reservation, reservation.getTotalAmount(), PaymentStatus.완료));
+        Payment payment = paymentService.create(new Payment(reservation.getMember(), reservation, reservation.getTotalAmount(), PaymentStatus.COMPLETED));
 
         // 예약 업데이트
         reservationService.confirmReservation(reservation.getId());

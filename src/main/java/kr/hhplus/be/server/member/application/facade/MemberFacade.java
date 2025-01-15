@@ -25,7 +25,7 @@ public class MemberFacade {
         Member member = memberService.chargeBalance(request);
 
         // 충전 내역 기록
-        balanceHistoryService.insertHistory(member, request.getAmount(), BalanceStatus.충전);
+        balanceHistoryService.insertHistory(member, request.getAmount(), BalanceStatus.CHARGE);
 
         return member.getBalance();
     }

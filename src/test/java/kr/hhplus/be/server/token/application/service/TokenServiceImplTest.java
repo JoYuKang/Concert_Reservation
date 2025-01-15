@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.token.application.service;
 
+import kr.hhplus.be.server.support.exception.ExpiredException;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import kr.hhplus.be.server.token.domain.Token;
 import kr.hhplus.be.server.token.domain.TokenStatus;
 import kr.hhplus.be.server.token.infrastructure.TokenJpaRepository;
@@ -47,7 +49,7 @@ class TokenServiceImplTest {
         // given
         String uuid = UUID.randomUUID().toString();
         // when, then
-        assertThatThrownBy(() -> tokenService.get(uuid)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> tokenService.get(uuid)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -59,7 +61,7 @@ class TokenServiceImplTest {
         // when
         when(tokenJpaRepository.save(any(Token.class))).thenReturn(token);
         // then
-        assertThat(tokenService.create()).isEqualTo(token);
+        assertThat(tokenService.create()).isEqualTo(uuid);
     }
 
     @Test
@@ -86,7 +88,7 @@ class TokenServiceImplTest {
             token.expire();
         }
         // when, then
-        assertThatThrownBy(() -> tokenService.active(tokens)).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> tokenService.active(tokens)).isInstanceOf(ExpiredException.class);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.reservation.application.facade;
 
+import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.concert.domain.Concert;
 import kr.hhplus.be.server.concert.domain.ConcertService;
 import kr.hhplus.be.server.member.domain.Member;
@@ -9,6 +10,8 @@ import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.reservation.interfaces.request.ReservationRequest;
 import kr.hhplus.be.server.seat.domain.Seat;
 import kr.hhplus.be.server.seat.domain.SeatService;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.SeatInvalidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,7 @@ public class ReservationFacade {
     }
 
     // 좌석 예약
+    @Transactional
     public Reservation createReservation(ReservationRequest request) {
 
         // member 확인
@@ -45,33 +49,10 @@ public class ReservationFacade {
         Concert concert = concertService.getById(request.getConcertId());
 
         // 판매중인 Seat 확인
-        List<Seat> availableSeats = seatService.getSeats(concert);
+        List<Seat> seats = seatService.searchSeatWithLock(request.getConcertId(), request.getSeatNumbers());
 
-        // 요청된 좌석 번호
-        List<Integer> requestedSeatNumbers = request.getSeatNumbers();
-
-        // 판매중인 좌석 번호 추출
-        List<Integer> availableSeatNumbers = availableSeats.stream()
-                .map(Seat::getSeatNumber)
-                .toList();
-
-        // 요청된 좌석 번호가 판매중 좌석에 포함되는지 확인
-        if (!new HashSet<>(availableSeatNumbers).containsAll(requestedSeatNumbers)) {
-            throw new IllegalArgumentException("요청된 좌석 중 유효하지 않은 좌석이 포함되어 있습니다.");
-        }
-        // 요청된 좌석을 Seat 엔티티로 변환
-        List<Seat> selectedSeats = availableSeats.stream()
-                .filter(seat -> requestedSeatNumbers.contains(seat.getSeatNumber()))
-                .toList();
-
-        // 좌석 상태 변경
-        for (Seat selectedSeat : selectedSeats) {
-            selectedSeat.reserve();
-        }
-        seatService.saveSeatAll(selectedSeats);
-
-        // 예약 확인
-        Reservation reservation = new Reservation(member, concert, selectedSeats);
+        // 예약 결제대기 저장
+        Reservation reservation = new Reservation(member, concert, seats);
 
         return reservationService.save(reservation);
     }

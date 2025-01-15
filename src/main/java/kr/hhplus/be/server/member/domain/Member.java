@@ -2,6 +2,8 @@ package kr.hhplus.be.server.member.domain;
 
 import jakarta.persistence.*;
 import kr.hhplus.be.server.support.common.Timestamped;
+import kr.hhplus.be.server.support.exception.AmountInvalidException;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,14 +27,19 @@ public class Member extends Timestamped {
     private Integer balance;
 
     public void chargeBalance(int amount) {
-        if (amount < 0) throw new IllegalArgumentException();
+        if (amount < 0) throw new AmountInvalidException(ErrorMessages.NEGATIVE_BALANCE_NOT_ALLOWED);
         balance += amount;
     }
 
     public void reduceBalance(int amount) {
-        if (amount < 0) throw new IllegalArgumentException("금액이 부족합니다.");
+        if (amount < 0) throw new AmountInvalidException(ErrorMessages.INSUFFICIENT_BALANCE);
         balance -= amount;
-        if (balance < 0) throw new IllegalArgumentException();
+        if (balance < 0) throw new AmountInvalidException(ErrorMessages.NEGATIVE_BALANCE_NOT_ALLOWED);
+    }
+
+    public Member(String name, int balance) {
+        this.name = name;
+        this.balance = balance;
     }
 
 }

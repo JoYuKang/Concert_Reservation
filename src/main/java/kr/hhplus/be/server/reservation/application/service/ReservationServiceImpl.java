@@ -4,6 +4,9 @@ import kr.hhplus.be.server.reservation.domain.Reservation;
 import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.reservation.domain.ReservationStatus;
 import kr.hhplus.be.server.reservation.infrastructure.ReservationJpaRepository;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.InvalidIdException;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,24 +32,25 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public Reservation confirmReservation(Long id) {
         Reservation reservation = findById(id);
-        return reservationRepository.save(reservation.updateStatus(ReservationStatus.확정));
+        return reservationRepository.save(reservation.updateStatus(ReservationStatus.CONFIRMED));
     }
 
     @Override
     public Reservation cancelReservation(Long id) {
         Reservation reservation = findById(id);
 
-        return reservationRepository.save( reservation.updateStatus(ReservationStatus.취소));
+        return reservationRepository.save( reservation.updateStatus(ReservationStatus.CANCELLED));
     }
 
     @Override
     public Reservation getReservationById(Long id) {
-        if (id < 1) throw new RuntimeException();
-        return reservationRepository.findById(id).orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+        if (id < 1) throw new InvalidIdException(ErrorMessages.INVALID_ID);
+        return reservationRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessages.RESERVATION_NOT_FOUND));
     }
 
     private Reservation findById(Long id) {
+
         return reservationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorMessages.RESERVATION_NOT_FOUND));
     }
 }

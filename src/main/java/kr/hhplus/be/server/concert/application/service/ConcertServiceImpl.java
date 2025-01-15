@@ -3,6 +3,9 @@ package kr.hhplus.be.server.concert.application.service;
 import kr.hhplus.be.server.concert.domain.Concert;
 import kr.hhplus.be.server.concert.domain.ConcertService;
 import kr.hhplus.be.server.concert.infrastructure.ConcertJpaRepository;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.InvalidIdException;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,7 @@ public class ConcertServiceImpl implements ConcertService {
     }
     @Override
     public Concert getById(Long id) {
-        if (id < 1) throw new IllegalArgumentException("잘못된 Concert ID 값 입니다.");
-        return concertJpaRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("해당 콘서트가 존재하지 않습니다."));
+        if (id < 1) throw new InvalidIdException(ErrorMessages.INVALID_ID);
+        return concertJpaRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessages.CONCERT_NOT_FOUND));
     }
 }

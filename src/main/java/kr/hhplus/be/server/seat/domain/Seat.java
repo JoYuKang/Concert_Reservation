@@ -28,14 +28,14 @@ public class Seat {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private SeatStatus status; // 판매중, 매진
+    private SeatStatus status; // AVAILABLE, SOLD_OUT
 
     public void reserve() {
-        this.status = SeatStatus.매진;
+        this.status = SeatStatus.SOLD_OUT;
     }
 
     public void cancle() {
-        this.status = SeatStatus.판매중;
+        this.status = SeatStatus.AVAILABLE;
     }
 
 }

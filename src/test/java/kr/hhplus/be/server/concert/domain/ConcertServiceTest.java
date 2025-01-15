@@ -2,6 +2,7 @@ package kr.hhplus.be.server.concert.domain;
 
 import kr.hhplus.be.server.concert.application.service.ConcertServiceImpl;
 import kr.hhplus.be.server.concert.infrastructure.ConcertJpaRepository;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,6 +71,6 @@ class ConcertServiceTest {
     @DisplayName("존재하지 않는 Concert Id를 입력하면 검색에 실패한다.")
     void failedGetById() {
         // when, that
-        assertThatThrownBy(() ->concertService.getById(1L)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() ->concertService.getById(1L)).isInstanceOf(NotFoundException.class);
     }
 }
