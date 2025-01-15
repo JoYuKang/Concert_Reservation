@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.member.application.service;
 
+import jakarta.transaction.Transactional;
 import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.member.infrastructure.MemberJpaRepository;
@@ -24,7 +25,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member chargeBalance(MemberRequest request) {
-        return memberRepository.findById(request.getId())
+
+        return memberRepository.findMemberWithLock(request.getId())
                 .map(member -> {
                     member.chargeBalance(request.getAmount());  // 잔액 충전
                     return memberRepository.save(member);  // 저장 후 수정된 Member 반환
@@ -34,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Member reduceBalance(Long id, Integer amount) {
-        return memberRepository.findById(id)
+        return memberRepository.findMemberWithLock(id)
                 .map(member -> {
                     member.reduceBalance(amount);  // 잔액 차감
                     return memberRepository.save(member);  // 저장 후 수정된 Member 반환

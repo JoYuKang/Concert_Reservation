@@ -19,17 +19,17 @@ INSERT INTO tb_reservation (member_id, concert_id, total_amount, status) VALUES
 
 -- tb_seat basic data
 INSERT INTO tb_seat (concert_id, position, amount, status) VALUES
-                                                                (1, 1, 100, 'AVAILABLE'),
-                                                                (1, 2, 120, 'AVAILABLE'),
-                                                                (1, 3, 150, 'AVAILABLE'),
-                                                                (1, 4, 180, 'AVAILABLE'),
-                                                                (2, 1, 100, 'AVAILABLE'),
-                                                                (2, 2, 120, 'AVAILABLE'),
-                                                                (2, 3, 150, 'AVAILABLE'),
-                                                                (2, 4, 180, 'AVAILABLE');
+                                                                (1, 1, 10000, 'AVAILABLE'),
+                                                                (1, 2, 12000, 'AVAILABLE'),
+                                                                (1, 3, 15000, 'AVAILABLE'),
+                                                                (1, 4, 18000, 'AVAILABLE'),
+                                                                (2, 1, 10000, 'AVAILABLE'),
+                                                                (2, 2, 12000, 'AVAILABLE'),
+                                                                (2, 3, 15000, 'AVAILABLE'),
+                                                                (2, 4, 18000, 'AVAILABLE');
 INSERT INTO tb_seat (concert_id, position, amount, status, reservation_id) VALUES
-                                                                (1, 5, 200, 'SOLD_OUT', 1),
-                                                                (2, 5, 200, 'SOLD_OUT', 1);
+                                                                (1, 14, 20000, 'SOLD_OUT', 1),
+                                                                (1, 15, 20000, 'SOLD_OUT', 1);
 
 -- tb_balance_history basic data
 INSERT INTO tb_balance_history (member_id, amount, status, created_at) VALUES
