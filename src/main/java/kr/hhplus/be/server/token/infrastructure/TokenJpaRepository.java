@@ -13,7 +13,7 @@ public interface TokenJpaRepository extends JpaRepository<Token, Long> {
 
     Optional<Token> findByToken(String token);
 
-    @Query("SELECT t FROM Token t WHERE t.status = 'INACTIVE' ORDER BY t.createTime ASC LIMIT :limit")
+    @Query("SELECT t FROM Token t WHERE t.status = 'INACTIVE' ORDER BY t.createTime ASC LIMIT:limit")
     List<Token> findInactiveTokens(@Param("limit") int limit);
 
     @Query("SELECT t FROM Token t WHERE t.expireTime < CURRENT_TIMESTAMP AND t.status = 'ACTIVE'")

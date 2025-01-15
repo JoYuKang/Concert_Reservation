@@ -12,6 +12,8 @@ public interface TokenService {
 
     Token expire(String token);
 
+    List<Token> expireList(List<Token> tokens);
+
     List<Token> findInactiveTokens();
 
     List<Token> findExpiredTokens();

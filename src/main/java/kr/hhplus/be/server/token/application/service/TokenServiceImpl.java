@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.token.application.service;
 
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import kr.hhplus.be.server.token.domain.Token;
 import kr.hhplus.be.server.token.domain.TokenService;
 import kr.hhplus.be.server.token.infrastructure.TokenJpaRepository;
@@ -19,7 +21,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token get(String token) {
-        return tokenJpaRepository.findByToken(token).orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
+
+        return tokenJpaRepository.findByToken(token).orElseThrow(() -> new NotFoundException(ErrorMessages.TOKEN_NOT_FOUND));
     }
 
     @Override
@@ -37,9 +40,17 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token expire(String token) {
-        Token activeToken = tokenJpaRepository.findByToken(token).orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
+        Token activeToken = tokenJpaRepository.findByToken(token).orElseThrow(() -> new NotFoundException(ErrorMessages.TOKEN_NOT_FOUND));
         activeToken.expire();
         return tokenJpaRepository.save(activeToken);
+    }
+
+    @Override
+    public List<Token> expireList(List<Token> tokens) {
+        for (Token token : tokens) {
+            token.expire();
+        }
+        return tokenJpaRepository.saveAll(tokens);
     }
 
     @Override
