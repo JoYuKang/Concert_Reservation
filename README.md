@@ -29,7 +29,7 @@ src/
 ├── support/
 │   ├── common/ 
 │          └── entity/                 # 공통 엔티티
-│   ├── exception/                     # 예외 관리
+│   ├── exception/                     # 예외 관리                  
 │   ├── config/
 │   │   ├── jpa/
 │   │   ├── web/
@@ -39,10 +39,12 @@ src/
 ├── member/                   
 │   ├── domain/
 │   │   ├── Member.java.                 # Member 엔티티
-│   │   ├── memberService.java.          # Member 서비스 구현체
+│   │   ├── memberService.java.          # Member 서비스 
 │   │   ├── MemberRepository.java.       # Member Interface   
 │   ├── application
 │   │   ├── facade
+│   │   ├── Service
+│   │   │   ├── memberService.java.          # Member 서비스 구현체
 │   ├── interfaces/ 
 │   │   ├── MemberController.java
 │   │   ├── dto
@@ -55,6 +57,13 @@ src/
 
 ```
 ## API Swagger
+
+### 유저의 토큰 발급 API
+<img width="1439" alt="image" src="https://github.com/user-attachments/assets/20cc7da3-05a7-43b5-a2bc-0ba29f65d28d" />
+
+### 유저의 토큰 조회 API
+<img width="1435" alt="image" src="https://github.com/user-attachments/assets/b692dee9-7e41-4b11-9308-1132bcb4f4c0" />
+
 ### 유저의 조회 API
 ![image](https://github.com/user-attachments/assets/1b422a75-f4d9-42f2-8101-f4b3d2f9701d)
 
