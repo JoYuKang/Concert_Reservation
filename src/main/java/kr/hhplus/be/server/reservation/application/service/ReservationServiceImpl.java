@@ -25,6 +25,11 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    public List<Reservation> getOverTime() {
+        return reservationRepository.findByOverTime();
+    }
+
+    @Override
     public Reservation save(Reservation reservation) {
         return reservationRepository.save(reservation);
     }
@@ -39,7 +44,7 @@ public class ReservationServiceImpl implements ReservationService {
     public Reservation cancelReservation(Long id) {
         Reservation reservation = findById(id);
 
-        return reservationRepository.save( reservation.updateStatus(ReservationStatus.CANCELLED));
+        return reservationRepository.save(reservation.updateStatus(ReservationStatus.CANCELLED));
     }
 
     @Override
@@ -49,7 +54,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private Reservation findById(Long id) {
-
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessages.RESERVATION_NOT_FOUND));
     }

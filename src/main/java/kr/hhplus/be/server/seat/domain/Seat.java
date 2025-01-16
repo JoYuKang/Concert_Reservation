@@ -34,7 +34,7 @@ public class Seat {
         this.status = SeatStatus.SOLD_OUT;
     }
 
-    public void cancle() {
+    public void cancel() {
         this.status = SeatStatus.AVAILABLE;
     }
 

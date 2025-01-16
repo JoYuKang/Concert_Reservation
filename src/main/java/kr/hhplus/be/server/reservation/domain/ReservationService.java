@@ -6,6 +6,8 @@ public interface ReservationService {
 
     List<Reservation> findByMemberId(Long memberId);
 
+    List<Reservation> getOverTime();
+
     Reservation save(Reservation reservation);
 
     Reservation confirmReservation(Long id);
