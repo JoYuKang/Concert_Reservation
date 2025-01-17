@@ -4,6 +4,7 @@ import kr.hhplus.be.server.support.exception.ErrorMessages;
 import kr.hhplus.be.server.support.exception.NotFoundException;
 import kr.hhplus.be.server.token.domain.Token;
 import kr.hhplus.be.server.token.domain.TokenService;
+import kr.hhplus.be.server.token.domain.TokenStatus;
 import kr.hhplus.be.server.token.infrastructure.TokenJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,13 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public List<Token> findInactiveTokens() {
-        return tokenJpaRepository.findInactiveTokens(ACTIVATION_LIMIT);
+        // 현재 활성화 되어있는 토큰 확인
+        List<Token> activeTokens = tokenJpaRepository.findByStatus(TokenStatus.ACTIVE);
+
+        int activeTotalNum = ACTIVATION_LIMIT - activeTokens.size();
+
+        // 기준 - 활성화된 토큰 = 활성화 해줘야할 토큰 가져오기
+        return tokenJpaRepository.findInactiveTokens(activeTotalNum);
     }
 
     public List<Token> findExpiredTokens() {
