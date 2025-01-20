@@ -39,19 +39,14 @@ public class PaymentFacade {
     @Transactional
     public Payment createPayment(Long memberId, PaymentRequest request, String token) {
 
-        // 예약 확인
-        Reservation reservation = reservationService.getReservationById(request.getReservationId());
+        // 맴버 확인
+        memberService.findById(memberId);
 
-        // 요청 맴버와 예약의 맴버 일치 확인
-        Member member = memberService.findById(memberId);
-        if (!Objects.equals(member.getId(), reservation.getMember().getId())) {
-            throw new UnauthorizedReservationException(ErrorMessages.UNAUTHORIZED_RESERVATION);
-        }
+        // 예약 확인
+        Reservation reservation = reservationService.getReservationById(request.getReservationId(), memberId);
 
         // 예약 유효성 확인
-        if (reservation.getCreateTime().isBefore(LocalDateTime.now().minusMinutes(5))) {
-            throw new ExpiredException(ErrorMessages.RESERVATION_EXPIRED);
-        }
+        reservationService.validate(reservation);
 
         // 맴버 잔액 차감
         Member reduceMember = memberService.reduceBalance(memberId, reservation.getTotalAmount());

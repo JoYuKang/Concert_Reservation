@@ -5,6 +5,7 @@ import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.member.interfaces.dto.request.MemberRequest;
 import kr.hhplus.be.server.support.exception.AmountInvalidException;
 import kr.hhplus.be.server.support.exception.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
+@Slf4j
 @SpringBootTest
 @Testcontainers
 @Sql(scripts = "/data.sql")
@@ -88,24 +89,14 @@ class MemberFacadeTest {
         // when
         for (int i = 0; i < 5; i++) {
             executor.submit(() -> {
-                boolean success = false;
-                int retryCount = 0;
-                while (!success && retryCount < 3) { // 재시도 로직 추가
-                    try {
-                        memberFacade.chargeBalanceWithHistory(memberRequest); // 객체 독립성 보장
-                        success = true;
-                    } catch (OptimisticLockException e) {
-                        retryCount++;
-                        System.out.println("Retrying transaction: " + retryCount);
-                    } catch (Exception e) {
-                        System.out.println("err >> " +e.getMessage());
-                        break;
-                    }
+                try {
+                    memberFacade.chargeBalanceWithHistory(memberRequest); // 객체 독립성 보장
+                } catch (Exception e) {
+                    log.info("err >> {}", e.getMessage());
                 }
                 latch.countDown();
             });
         }
-
         latch.await(); // 모든 스레드가 완료될 때까지 대기
         executor.shutdown();
 

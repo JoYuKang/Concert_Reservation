@@ -7,6 +7,7 @@ import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.reservation.infrastructure.ReservationJpaRepository;
 import kr.hhplus.be.server.reservation.interfaces.request.ReservationRequest;
 import kr.hhplus.be.server.support.exception.SeatInvalidException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Slf4j
 @SpringBootTest
 @Testcontainers
 @Sql(scripts = "/data.sql")
@@ -99,9 +101,9 @@ class ReservationFacadeTest {
                         success = true;
                     } catch (OptimisticLockException e) {
                         retryCount++;
-                        System.out.println("Retrying transaction : " + request.getMemberId() + " : " + retryCount);
+                        log.info("Retrying transaction : {} : {}", request.getMemberId(), retryCount);
                     } catch (Exception e) {
-                        System.out.println("Error : " + request.getMemberId() + " : " + e.getMessage());
+                        log.info("Error : {} : {}", request.getMemberId(), e.getMessage());
                         break;
                     }
                 }
