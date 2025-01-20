@@ -1,7 +1,10 @@
 package kr.hhplus.be.server.token.application.service;
 
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.NotFoundException;
 import kr.hhplus.be.server.token.domain.Token;
 import kr.hhplus.be.server.token.domain.TokenService;
+import kr.hhplus.be.server.token.domain.TokenStatus;
 import kr.hhplus.be.server.token.infrastructure.TokenJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +22,8 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token get(String token) {
-        return tokenJpaRepository.findByToken(token).orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
+
+        return tokenJpaRepository.findByToken(token).orElseThrow(() -> new NotFoundException(ErrorMessages.TOKEN_NOT_FOUND));
     }
 
     @Override
@@ -37,14 +41,28 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Token expire(String token) {
-        Token activeToken = tokenJpaRepository.findByToken(token).orElseThrow(() -> new RuntimeException("토큰이 존재하지 않습니다."));
+        Token activeToken = tokenJpaRepository.findByToken(token).orElseThrow(() -> new NotFoundException(ErrorMessages.TOKEN_NOT_FOUND));
         activeToken.expire();
         return tokenJpaRepository.save(activeToken);
     }
 
     @Override
+    public List<Token> expireList(List<Token> tokens) {
+        for (Token token : tokens) {
+            token.expire();
+        }
+        return tokenJpaRepository.saveAll(tokens);
+    }
+
+    @Override
     public List<Token> findInactiveTokens() {
-        return tokenJpaRepository.findInactiveTokens(ACTIVATION_LIMIT);
+        // 현재 활성화 되어있는 토큰 확인
+        List<Token> activeTokens = tokenJpaRepository.findByStatus(TokenStatus.ACTIVE);
+
+        int activeTotalNum = ACTIVATION_LIMIT - activeTokens.size();
+
+        // 기준 - 활성화된 토큰 = 활성화 해줘야할 토큰 가져오기
+        return tokenJpaRepository.findInactiveTokens(activeTotalNum);
     }
 
     public List<Token> findExpiredTokens() {

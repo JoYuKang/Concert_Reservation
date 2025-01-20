@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.token.domain;
 
 import jakarta.persistence.*;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.ExpiredException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,16 +26,15 @@ public class Token {
     @Enumerated(EnumType.STRING)
     private TokenStatus status;
 
-    @Column(name = "create_at")
+    @Column(name = "created_at")
     private LocalDateTime createTime;
 
-    @Column(name = "expire_at")
+    @Column(name = "expired_at")
     private LocalDateTime expireTime;
 
     public Token(String token) {
         this.token = token;
         this.createTime = LocalDateTime.now();
-        this.expireTime = LocalDateTime.now().plusMinutes(30);
         this.status = TokenStatus.INACTIVE;
     }
 
@@ -44,7 +45,7 @@ public class Token {
 
     public void active() {
         if (this.status == TokenStatus.EXPIRED) {
-            throw new IllegalStateException("이미 만료된 토큰입니다.");
+            throw new ExpiredException(ErrorMessages.TOKEN_EXPIRED);
         }
         this.expireTime = LocalDateTime.now().plusMinutes(30);
         this.status = TokenStatus.ACTIVE;

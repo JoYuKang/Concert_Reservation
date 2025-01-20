@@ -26,7 +26,7 @@ public class BalanceHistory extends Timestamped {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private BalanceStatus status; // 충전, 사용
+    private BalanceStatus status; // USE, CHARGE
 
     public BalanceHistory(Member member, Integer amount, BalanceStatus status) {
         this.memberId = member;

@@ -31,7 +31,7 @@ public class Payment extends Timestamped {
     private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private PaymentStatus status; // 완료, 취소
+    private PaymentStatus status; // COMPLETED, CANCELLED
 
     public Payment(Member member, Reservation reservation, Integer amount, PaymentStatus status) {
         this.member = member;

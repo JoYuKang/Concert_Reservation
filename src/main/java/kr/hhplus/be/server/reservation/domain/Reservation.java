@@ -5,6 +5,8 @@ import kr.hhplus.be.server.concert.domain.Concert;
 import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.seat.domain.Seat;
 import kr.hhplus.be.server.support.common.Timestamped;
+import kr.hhplus.be.server.support.exception.ErrorMessages;
+import kr.hhplus.be.server.support.exception.PaymentStatusException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,23 +31,23 @@ public class Reservation extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
-    @JoinColumn(name = "cpncert_id", nullable = false)
+    @JoinColumn(name = "concert_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Concert concert;
 
     @Column(name = "seat_id")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "reservation_id", nullable = false)
+    @JoinColumn(name = "reservation_id")
     private List<Seat> seats = new ArrayList<>();
 
     @Column(name = "total_amount", nullable = false)
     private Integer totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status; // 확정, 취소, 결제대기
+    private ReservationStatus status; // CONFIRMED, CANCELLED, AWAITING_PAYMENT
 
     public Reservation updateStatus(ReservationStatus status) {
-        if (this.status != ReservationStatus.결제대기) throw new IllegalArgumentException("결제할 수 있는 상태가 아닙니다.");
+        if (this.status != ReservationStatus.AWAITING_PAYMENT) throw new PaymentStatusException(ErrorMessages.ERROR_PAYMENT_NOT_ALLOWED);
         this.status = status;
         return this;
     }
@@ -59,7 +61,7 @@ public class Reservation extends Timestamped {
         this.concert = concert;
         this.seats = seats;
         this.totalAmount = seats.stream().mapToInt(Seat::getAmount).sum();
-        this.status = ReservationStatus.결제대기;
+        this.status = ReservationStatus.AWAITING_PAYMENT;
     }
 
 }

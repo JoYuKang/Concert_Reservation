@@ -40,10 +40,10 @@ class PaymentServiceImplTest {
         Member member = new Member(1L,"test member", 10000);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.판매중);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
         seats.add(seat);
-        Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.결제대기);
-        Payment payment = new Payment(1L, member, reservation, 10000, PaymentStatus.완료);
+        Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
+        Payment payment = new Payment(1L, member, reservation, 10000, PaymentStatus.COMPLETED);
 
         // when
         when(paymentJpaRepository.save(payment)).thenReturn(payment);
