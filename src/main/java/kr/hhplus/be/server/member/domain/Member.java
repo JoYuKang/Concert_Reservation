@@ -24,6 +24,7 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String name;
 
+    @Version
     private Integer balance;
 
     public void chargeBalance(int amount) {
