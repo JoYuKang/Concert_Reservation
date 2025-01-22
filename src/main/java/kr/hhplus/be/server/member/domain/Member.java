@@ -24,8 +24,11 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String name;
 
-    @Version
     private Integer balance;
+
+    @Version
+    @Column(nullable = false)
+    private Integer version = 0; // JPA가 자동으로 관리할 필드
 
     public void chargeBalance(int amount) {
         if (amount < 0) throw new AmountInvalidException(ErrorMessages.NEGATIVE_BALANCE_NOT_ALLOWED);

@@ -1,13 +1,13 @@
 -- tb_member basic data
-INSERT INTO tb_member (name, balance) VALUES
-                                        ('Alice', 50000),
-                                        ('Bob', 30000),
-                                        ('Kang', 70000),
-                                        ('Kim', 70000),
-                                        ('Kong', 70000),
-                                        ('Hoo', 70000),
-                                        ('Ace', 70000),
-                                        ('Nana', 70000);
+INSERT INTO tb_member (name, balance, version) VALUES
+                                        ('Alice', 50000, 0),
+                                        ('Bob', 30000, 0),
+                                        ('Kang', 70000, 0),
+                                        ('Kim', 70000, 0),
+                                        ('Kong', 70000, 0),
+                                        ('Hoo', 70000, 0),
+                                        ('Ace', 70000, 0),
+                                        ('Nana', 70000, 0);
 
 -- tb_token basic data
 INSERT INTO tb_token (token, status, created_at, expired_at) VALUES

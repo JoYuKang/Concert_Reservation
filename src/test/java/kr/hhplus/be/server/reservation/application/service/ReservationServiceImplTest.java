@@ -42,7 +42,7 @@ class ReservationServiceImplTest {
     @DisplayName("유저에 대한 예약 내역을 조회할 수 있다.")
     void findByMemberId() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -59,7 +59,7 @@ class ReservationServiceImplTest {
     @DisplayName("예약을 저장한다.")
     void save() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -76,7 +76,7 @@ class ReservationServiceImplTest {
     @DisplayName("예약을 확정으로 변경한다.")
     void confirmReservation() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -94,7 +94,7 @@ class ReservationServiceImplTest {
     @DisplayName("결제대기가 아닌 예약을 확정으로 변경 시 변경에 실패한다.")
     void failedConfirmReservation() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -112,7 +112,7 @@ class ReservationServiceImplTest {
     @DisplayName("예약을 취소로 변경한다.")
     void cancelReservation() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -130,7 +130,7 @@ class ReservationServiceImplTest {
     @DisplayName("결제대기가 아닌 예약을 취소로 변경 시 변경에 실패한다.")
     void failedCancelReservation() {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
@@ -148,7 +148,7 @@ class ReservationServiceImplTest {
     @DisplayName("예약 유효 시간이 지난 예약은 유효하지 않다.")
     void failedValidateReservation() throws NoSuchFieldException, IllegalAccessException {
         // given
-        Member member = new Member(1L,"test member", 10000);
+        Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
