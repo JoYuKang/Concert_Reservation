@@ -8,6 +8,7 @@ import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.reservation.domain.Reservation;
 import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.reservation.interfaces.request.ReservationRequest;
+import kr.hhplus.be.server.seat.application.service.SeatServiceImpl;
 import kr.hhplus.be.server.seat.domain.Seat;
 import kr.hhplus.be.server.seat.domain.SeatService;
 import kr.hhplus.be.server.support.exception.ErrorMessages;
@@ -30,6 +31,8 @@ public class ReservationFacade {
 
     private final SeatService seatService;
 
+    private final SeatServiceImpl seatServiceImpl;
+
     // 좌석 예약 조회
     public List<Reservation> findMemberReservation(Long memberId) {
         // member 확인
@@ -50,6 +53,24 @@ public class ReservationFacade {
 
         // 판매중인 Seat 확인
         List<Seat> seats = seatService.searchSeatWithLock(request.getConcertId(), request.getSeatNumbers());
+
+        // 예약 결제대기 저장
+        Reservation reservation = new Reservation(member, concert, seats);
+
+        return reservationService.save(reservation);
+    }
+
+    @Transactional
+    public Reservation createReservationNoLock(ReservationRequest request) {
+
+        // member 확인
+        Member member = memberService.findById(request.getMemberId());
+
+        // concert 확인
+        Concert concert = concertService.getById(request.getConcertId());
+
+        // 판매중인 Seat 확인
+        List<Seat> seats = seatServiceImpl.searchSeat(request.getConcertId(), request.getSeatNumbers());
 
         // 예약 결제대기 저장
         Reservation reservation = new Reservation(member, concert, seats);

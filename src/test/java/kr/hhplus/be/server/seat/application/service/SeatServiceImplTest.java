@@ -35,7 +35,7 @@ class SeatServiceImplTest {
     void getConcernedSeats() {
         // given
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
-        Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
         // when
         when(seatJpaRepository.findByConcertAndStatus(concert, SeatStatus.AVAILABLE)).thenReturn(List.of(seat));
         // then
@@ -58,8 +58,8 @@ class SeatServiceImplTest {
     void failedGetConcernedSeats() {
         // given
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
-        Seat seat1 = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE);
-        Seat seat2 = new Seat(2L, concert, 15, 50000, SeatStatus.SOLD_OUT);
+        Seat seat1 = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
+        Seat seat2 = new Seat(2L, concert, 15, 50000, SeatStatus.SOLD_OUT, 0);
 
         // when
         when(seatJpaRepository.findByConcertIdAndPositionWithLock(concert.getId(), List.of(14, 15))).thenReturn(List.of(seat1, seat2));

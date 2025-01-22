@@ -45,7 +45,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
         // when
@@ -62,7 +62,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
         // when
@@ -79,7 +79,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
         // when
@@ -97,7 +97,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.CONFIRMED);
         // when
@@ -115,7 +115,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
         // when
@@ -133,7 +133,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.CANCELLED);
         // when
@@ -151,7 +151,7 @@ class ReservationServiceImplTest {
         Member member = new Member(1L,"test member", 10000, 0);
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
         List<Seat> seats = new ArrayList<>();
-        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
         Reservation reservation = new Reservation(1L, member, concert, seats, 50000, ReservationStatus.AWAITING_PAYMENT);
         Field createTimeField = Timestamped.class.getDeclaredField("createTime");

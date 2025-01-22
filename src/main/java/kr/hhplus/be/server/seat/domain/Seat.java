@@ -30,6 +30,11 @@ public class Seat {
     @Enumerated(EnumType.STRING)
     private SeatStatus status; // AVAILABLE, SOLD_OUT
 
+    @Version
+    @Column(nullable = false)
+    private Integer version = 0; // JPA가 자동으로 관리할 필드
+
+
     public void reserve() {
         this.status = SeatStatus.SOLD_OUT;
     }
