@@ -14,9 +14,8 @@ import java.util.List;
 public interface SeatJpaRepository extends JpaRepository<Seat, Long> {
 
     List<Seat> findByConcertAndStatus(Concert concert, SeatStatus status);
-
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    
     @Query("SELECT s FROM Seat s WHERE s.concert.id = :concertId AND s.seatNumber IN :positions")
-    List<Seat> findByConcertIdAndPositionWithLock(@Param("concertId") Long concertId, @Param("positions") List<Integer> positions);
+    List<Seat> findByConcertIdAndPosition(@Param("concertId") Long concertId, @Param("positions") List<Integer> positions);
 
 }

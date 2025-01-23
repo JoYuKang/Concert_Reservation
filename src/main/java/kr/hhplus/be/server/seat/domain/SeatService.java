@@ -10,5 +10,5 @@ public interface SeatService {
 
     void saveSeatAll(List<Seat> seats);
 
-    List<Seat> searchSeatWithLock(Long concertId, List<Integer> seatNumbers);
+    List<Seat> searchSeat(Long concertId, List<Integer> seatNumbers);
 }

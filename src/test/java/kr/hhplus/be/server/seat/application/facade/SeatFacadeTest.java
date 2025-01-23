@@ -40,7 +40,7 @@ class SeatFacadeTest {
     void getConcernedSeats() {
         // given
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
-        Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE);
+        Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
 
         // when
         when(concertService.getById(1L)).thenReturn(concert);

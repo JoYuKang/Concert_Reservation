@@ -25,7 +25,7 @@ public class MemberFacade {
     @Retryable(
             retryFor = OptimisticLockException.class,
             maxAttempts = 3,
-            backoff = @Backoff(delay = 100)
+            backoff = @Backoff(delay = 300)
     )
     @Transactional
     public Integer chargeBalanceWithHistory(MemberRequest request) {

@@ -90,7 +90,7 @@ class MemberFacadeTest {
         for (int i = 0; i < 5; i++) {
             executor.submit(() -> {
                 try {
-                    memberFacade.chargeBalanceWithHistory(memberRequest); // 객체 독립성 보장
+                    memberFacade.chargeBalanceWithHistory(memberRequest);
                 } catch (Exception e) {
                     log.info("err >> {}", e.getMessage());
                 }
