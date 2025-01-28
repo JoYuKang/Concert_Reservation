@@ -32,4 +32,5 @@ public class ErrorMessages {
 
     // 좌석 관련 에러 메시지
     public static final String SEAT_INVALID = "좌석이 유효하지 않습니다.";
+    public static final String SEAT_NOT_FOUND = "좌석 조회에 실패했습니다.";
 }

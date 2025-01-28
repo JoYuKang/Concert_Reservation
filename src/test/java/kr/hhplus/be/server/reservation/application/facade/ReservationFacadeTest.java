@@ -107,10 +107,8 @@ class ReservationFacadeTest {
                 long startTime = System.nanoTime(); // 요청 시작 시간
                 try {
                     reservationFacade.createReservation(request);
-                } catch (OptimisticLockException e) {
-                    failCount.incrementAndGet();
-                    log.info("Retrying transaction : {} ", request.getMemberId());
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     failCount.incrementAndGet();
                     log.info("Error : {} : {} ", e, e.getMessage());
                 }
@@ -138,6 +136,10 @@ class ReservationFacadeTest {
         requestTimes.forEach((memberId, time) -> {
             log.info("Member {} request time: {} ms", memberId, time / 1_000_000);
         });
+
+        for (long i = 2L; i <= 7L;  i++){
+            List<Reservation> byMemberId = reservationService.findByMemberId(i);
+        }
 
         // 전체 소요 시간 출력
         log.info("Total execution time: {} ms", (totalEndTime - totalStartTime) / 1_000_000);
