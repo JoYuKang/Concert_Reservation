@@ -218,41 +218,56 @@ public class ReservationFacade {
 
 ### 데이터 업데이트에 @Version 추가 및 예외 처리
 
+낙관적락은 데이터 업데이트 시 @Version을 확인하여 동시성을 관리합니다.
 ```java
-@Retryable(
-    retryFor = OptimisticLockException.class,
-    maxAttempts = 2,
-    backoff = @Backoff(delay = 100)
-)
+public class Seat {
+
+    @Id
+    @Column(name = "seat_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "concert_id", nullable = false)
+    private Concert concert;
+
+    @Column(name = "position")
+    private Integer seatNumber;
+
+    private Integer amount;
+
+    @Enumerated(EnumType.STRING)
+    private SeatStatus status; // AVAILABLE, SOLD_OUT
+
+    @Version
+    @Column(nullable = false)
+    private Integer version = 0; // JPA가 자동으로 관리할 필드
+}
+
+```
+낙관적락 좌석 확인 로직
+```java
+@Transactional
 @Override
 public List<Seat> searchSeat(Long concertId, List<Integer> seatNumbers) {
-    if (!isRetryable) {
-        throw new OptimisticLockException("Retry attempts exceeded.");
-    }
-
     try {
+        // 요청된 좌석 가져오기
         List<Seat> selectedSeat = seatJpaRepository.findByConcertIdAndPosition(concertId, seatNumbers);
-
+        // 좌석 유효성 확인
         for (Seat seat : selectedSeat) {
             if (seat.getStatus() == SeatStatus.SOLD_OUT) {
                 throw new SeatInvalidException(ErrorMessages.SEAT_INVALID);
             }
             seat.reserve();
         }
-
-        List<Seat> savedSeats = seatJpaRepository.saveAll(selectedSeat);
-        seatJpaRepository.flush();
-        return savedSeats;
+        return seatJpaRepository.saveAll(selectedSeat);
     } catch (ObjectOptimisticLockingFailureException ex) {
-        if (isRetryable) {
-            isRetryable = false;
-            throw ex;
-        } else {
-            throw new OptimisticLockException("예약에 실패했습니다.");
-        }
+        throw new SeatInvalidException(ErrorMessages.SEAT_NOT_FOUND);
     }
 }
 ```
+
+SeatInvalidException으로 좌석 예외를 관리하며, 좌석에 대한 오류 상세 내역을 SEAT_INVALID과 SEAT_NOT_FOUND의 문구를 통해 어떤 에러가 발생했는지 확인할 수 있습니다.
 
 ---
 
@@ -284,10 +299,8 @@ INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Total execution time:
 
 ### 낙관적 락으로 변경한 이유
 
-낙관적 락 방식으로 변경한 주된 이유는 동시성 처리 시 성능에 좀 더 우선순위를 두어 사용자 경험을 향상시키기 위함입니다. 비관적 락은 트랜잭션 간 대기가 발생하여 대량 요청 시 성능 저하가 우려되는 반면, 낙관적 락은 데이터 충돌이 실제로 발생했을 때만 이를 처리하므로 성능 향상을 기대할 수 있습니다.
+비관적 락에서 낙관적 락으로 변경한 주된 이유는 동시성 처리에서 성능을 개선하고 사용자 경험을 향상하기 위해서입니다. 기존 비관적 락 방식은 트랜잭션이 자원을 점유하는 동안 다른 트랜잭션이 대기해야 했기 때문에 대량의 동시 요청이 발생할 경우 성능 저하와 처리 속도 감소 문제가 발생했습니다. 반면, 낙관적 락은 자원 점유를 최소화하고 데이터 충돌이 실제로 발생했을 때만 이를 처리하는 방식으로 설계되어 성능을 향상시킬 수 있습니다.
 
-낙관적 락 구현에서는 첫 번째 트랜잭션 실패 시 100ms 대기 후 최대 1회 재시도를 허용하며, 반복 충돌 시 신속히 예외를 반환하여 사용자 대기 시간을 최소화했습니다. 이를 통해 시스템 자원 사용을 최적화하고 성능을 유지하면서 동시성 이슈를 효과적으로 관리했습니다.
-
-
+낙관적 락 구현으로 첫 시도만을 허용하고 다른 동시성 이슈가 발생 시 더 이상 재시도를 진행하지 않고 예외를 클라이언트에게 전달합니다. 이런 방법으로 시스템 자원을 효율적으로 사용하면서 동시에 충돌 관리 로직을 간소화했습니다.
 
 
