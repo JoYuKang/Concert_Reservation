@@ -49,7 +49,7 @@ public class ReservationFacade {
         Concert concert = concertService.getById(request.getConcertId());
 
         // 판매중인 Seat 확인
-        List<Seat> seats = seatService.searchSeatWithLock(request.getConcertId(), request.getSeatNumbers());
+        List<Seat> seats = seatService.searchSeat(request.getConcertId(), request.getSeatNumbers());
 
         // 예약 결제대기 저장
         Reservation reservation = new Reservation(member, concert, seats);

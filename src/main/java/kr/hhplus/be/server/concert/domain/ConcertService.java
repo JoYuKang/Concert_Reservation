@@ -11,11 +11,11 @@ import java.util.Optional;
 
 public interface ConcertService {
 
-    // 이름 조회
-    List<Concert> findByTitle(String title);
+    // 제목 조회
+    Page<Concert> findByTitle(String title, Integer offset, Integer limit);
 
     // 날짜 조회
-    List<Concert> findByDate(LocalDate date);
+    Page<Concert> findByDate(LocalDate date, Integer offset, Integer limit);
 
     // 콘서트 ID 조회
     Concert getById(Long id);

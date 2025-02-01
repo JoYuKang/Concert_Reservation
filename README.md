@@ -89,5 +89,218 @@ src/
 ![image](https://github.com/user-attachments/assets/2b68a2f1-2a67-4026-807f-2c49d529d42e)
 
 
+## 동시성 문제는 왜 발생하는가?
+
+컴퓨터는 마치 여러 가지 일을 동시에 처리하는 것처럼 보이지만, 실제로는 한 번에 하나의 작업씩 순차적으로 처리하고 있습니다. 이 과정에서 동일한 데이터에 대해 여러 트랜잭션이 동시에 접근하거나 수정하려고 시도하면, 데이터의 정합성에 문제가 발생할 수 있습니다.
+
+예를 들어, 두 트랜잭션이 동시에 같은 데이터를 읽고, 각각 수정한 뒤 저장하려고 하면, 한쪽의 수정 내용이 덮어씌워지거나 의도치 않은 값이 저장될 위험이 있습니다. 이러한 동시성 문제는 데이터 일관성을 위협하며 시스템의 안정성과 신뢰성을 저하시킬 수 있습니다.
+
+이러한 이슈를 해결하기 위해 낙관적 락, 비관적 락, 레디스 등 다양한 방법으로 동시성을 해결하고 있습니다. 각각의 방법은 장단점이 있기 때문에 비즈니스 요구사항에 맞춰 데이터의 일관성을 유지하면서도 성능을 고려한 선택을 해야 합니다.
+
+---
+
+## 낙관적 락과 비관적 락 비교
+
+| 특징           | 낙관적 락 (Optimistic Lock)                                                    | 비관적 락 (Pessimistic Lock)                                                  |
+|----------------|-------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| 개념           | 데이터 읽을 때 락을 걸지 않으며, 변경 시 충돌 여부 확인 후 재시도 또는 실패 처리 | 데이터를 읽을 때 바로 락을 걸어 다른 트랜잭션이 데이터에 접근하지 못하게 함     |
+| 충돌 처리 방식 | 충돌 발생 시 예외를 던지고, 재시도 로직이나 다른 처리 로직으로 문제를 해결         | 충돌 방지를 위해 트랜잭션 종료 시까지 데이터 락 유지                         |
+| 사용 상황      | 충돌이 드물고 다중 사용자 환경에서 높은 동시성 보장이 필요한 경우               | 충돌 가능성이 높고 데이터 정합성이 중요한 경우                               |
+| 성능           | 데이터 충돌이 적은 경우 성능 우수                                              | 락으로 인한 대기 시간 증가로 트랜잭션 처리량 감소                            |
+| 락 방식        | DB 버전 필드(@Version)나 타임스탬프 활용                                       | DB의 S-Lock 또는 X-Lock 활용                                                |
+| 장점           | 높은 동시성 처리 가능, 오버헤드 감소                                           | 데이터 정합성 보장                                                           |
+| 단점           | 충돌이 빈번하면 재시도로 인한 성능 저하                                        | 대기 시간 증가, 데드락(Deadlock) 위험                                        |
+
+---
+
+## 비관적 락 (S-Lock, X-Lock) 비교
+
+| 특징           | Shared Lock (S-Lock)                                              | Exclusive Lock (X-Lock)                                                     |
+|----------------|-------------------------------------------------------------------|----------------------------------------------------------------------------|
+| 개념           | 데이터를 읽기 작업에만 사용하도록 허용                              | 데이터를 읽기 및 수정 작업에 대해 독점적으로 사용                            |
+| 허용되는 작업  | 읽기 작업 가능, 다른 트랜잭션도 동일 데이터 읽기 가능               | 읽기 및 쓰기 작업 가능, 다른 트랜잭션의 모든 작업 차단                       |
+| 동시성 지원    | 읽기 작업 간 높은 동시성 지원                                      | 트랜잭션이 데이터 독점 접근, 동시성 제한                                     |
+| 목적           | 읽기 작업 충돌 방지 및 데이터 변경 방지                             | 데이터 읽기/쓰기 충돌 방지 및 정합성 보장                                    |
+| 교착 상태 가능성 | S-Lock과 X-Lock 혼합 사용 시 발생 가능                              | X-Lock 간 충돌로 Deadlock 발생 가능                                         |
+| 성능           | 성능에 큰 영향 없음                                               | 동시성 낮아져 성능 저하 가능                                                |
+
+---
+## 콘서트에서 발생하는 동시성 이슈
+콘서트에서 발생하는 대표적인 동시성 이슈는 콘서트의 좌석을 여러명의 유저가 동시에 에약하는 상황에서 주로 발생하여 다음 상황에서의 비관적 락과 낙관적 락의 적용 시 어떤 성능의 차이가 있는지 비교해 보겠습니다. 
+
+## 콘서트 좌석 예약 로직 비관적 락 (X-Lock) 예제
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ReservationFacade {
+
+    private final ReservationService reservationService;
+    private final MemberService memberService;
+    private final ConcertService concertService;
+    private final SeatService seatService;
+
+    // 좌석 예약
+    @Transactional
+    public Reservation createReservation(ReservationRequest request) {
+        // member 확인
+        Member member = memberService.findById(request.getMemberId());
+
+        // concert 확인
+        Concert concert = concertService.getById(request.getConcertId());
+
+        // 판매중인 Seat 확인 비관적 락 적용
+        List<Seat> seats = seatService.searchSeatWithLock(request.getConcertId(), request.getSeatNumbers());
+
+        // 예약 결제대기 저장
+        Reservation reservation = new Reservation(member, concert, seats);
+
+        return reservationService.save(reservation);
+    }
+}
+```
+
+### 좌석 조회 시 락 적용
+
+```java
+@Override
+public List<Seat> searchSeatWithLock(Long concertId, List<Integer> seatNumbers) {
+    List<Seat> selectedSeat = seatJpaRepository.findByConcertIdAndPositionWithLock(concertId, seatNumbers);
+
+    for (Seat seat : selectedSeat) {
+        if (seat.getStatus() == SeatStatus.SOLD_OUT) {
+            throw new SeatInvalidException(ErrorMessages.SEAT_INVALID);
+        }
+        seat.reserve();
+    }
+
+    return seatJpaRepository.saveAll(selectedSeat);
+}
+
+@Lock(LockModeType.PESSIMISTIC_WRITE)
+@Query("SELECT s FROM Seat s WHERE s.concert.id = :concertId AND s.seatNumber IN :positions")
+List<Seat> findByConcertIdAndPositionWithLock(@Param("concertId") Long concertId, @Param("positions") List<Integer> positions);
+```
+
+---
+
+## 콘서트 좌석 예약 로직 낙관적 락 (S-Lock) 예제
+
+```java
+@Service
+@RequiredArgsConstructor
+public class ReservationFacade {
+
+    private final ReservationService reservationService;
+    private final MemberService memberService;
+    private final ConcertService concertService;
+    private final SeatService seatService;
+
+    // 좌석 예약
+    @Transactional
+    public Reservation createReservation(ReservationRequest request) {
+        // member 확인
+        Member member = memberService.findById(request.getMemberId());
+
+        // concert 확인
+        Concert concert = concertService.getById(request.getConcertId());
+
+        // 판매중인 Seat 확인
+        List<Seat> seats = seatService.searchSeat(request.getConcertId(), request.getSeatNumbers());
+
+        // 예약 결제대기 저장
+        Reservation reservation = new Reservation(member, concert, seats);
+
+        return reservationService.save(reservation);
+    }
+}
+```
+
+### 데이터 업데이트에 @Version 추가 및 예외 처리
+
+낙관적락은 데이터 업데이트 시 @Version을 확인하여 동시성을 관리합니다.
+```java
+public class Seat {
+
+    @Id
+    @Column(name = "seat_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "concert_id", nullable = false)
+    private Concert concert;
+
+    @Column(name = "position")
+    private Integer seatNumber;
+
+    private Integer amount;
+
+    @Enumerated(EnumType.STRING)
+    private SeatStatus status; // AVAILABLE, SOLD_OUT
+
+    @Version
+    @Column(nullable = false)
+    private Integer version = 0; // JPA가 자동으로 관리할 필드
+}
+
+```
+낙관적락 좌석 확인 로직
+```java
+@Transactional
+@Override
+public List<Seat> searchSeat(Long concertId, List<Integer> seatNumbers) {
+    try {
+        // 요청된 좌석 가져오기
+        List<Seat> selectedSeat = seatJpaRepository.findByConcertIdAndPosition(concertId, seatNumbers);
+        // 좌석 유효성 확인
+        for (Seat seat : selectedSeat) {
+            if (seat.getStatus() == SeatStatus.SOLD_OUT) {
+                throw new SeatInvalidException(ErrorMessages.SEAT_INVALID);
+            }
+            seat.reserve();
+        }
+        return seatJpaRepository.saveAll(selectedSeat);
+    } catch (ObjectOptimisticLockingFailureException ex) {
+        throw new SeatInvalidException(ErrorMessages.SEAT_NOT_FOUND);
+    }
+}
+```
+
+SeatInvalidException으로 좌석 예외를 관리하며, 좌석에 대한 오류 상세 내역을 SEAT_INVALID과 SEAT_NOT_FOUND의 문구를 통해 어떤 에러가 발생했는지 확인할 수 있습니다.
+
+---
+
+## 비관적 락 vs 낙관적 락 성능 비교
+
+### 비관적 락 소요 시간
+```
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 2 request time: 86 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 3 request time: 92 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 4 request time: 86 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 5 request time: 75 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 6 request time: 103 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 7 request time: 103 ms
+INFO 93109 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Total execution time: 104 ms
+```
+
+### 낙관적 락 소요 시간
+```
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 2 request time: 60 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 3 request time: 67 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 4 request time: 66 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 5 request time: 71 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 6 request time: 71 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Member 7 request time: 66 ms
+INFO 8535 --- [main] k.h.b.s.r.a.f.ReservationFacadeTest : Total execution time: 72 ms
+```
+
+---
+
+### 낙관적 락으로 변경한 이유
+
+비관적 락에서 낙관적 락으로 변경한 주된 이유는 동시성 처리에서 성능을 개선하고 사용자 경험을 향상하기 위해서입니다. 기존 비관적 락 방식은 트랜잭션이 자원을 점유하는 동안 다른 트랜잭션이 대기해야 했기 때문에 대량의 동시 요청이 발생할 경우 성능 저하와 처리 속도 감소 문제가 발생했습니다. 반면, 낙관적 락은 자원 점유를 최소화하고 데이터 충돌이 실제로 발생했을 때만 이를 처리하는 방식으로 설계되어 성능을 향상시킬 수 있습니다.
+
+낙관적 락 구현으로 첫 시도만을 허용하고 다른 동시성 이슈가 발생 시 더 이상 재시도를 진행하지 않고 예외를 클라이언트에게 전달합니다. 이런 방법으로 시스템 자원을 효율적으로 사용하면서 동시에 충돌 관리 로직을 간소화했습니다.
 
 

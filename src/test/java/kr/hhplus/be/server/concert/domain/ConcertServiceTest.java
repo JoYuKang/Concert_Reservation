@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
 
 
 import java.time.LocalDate;
@@ -33,25 +34,30 @@ class ConcertServiceTest {
     void findByTitle() {
         // given
         Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        List<Concert> concertList = List.of(concert);
+        Pageable pageable = PageRequest.of(1, 5, Sort.by("concertDate").ascending());
+        Page<Concert> concertPage = new PageImpl<>(concertList, pageable, concertList.size());
 
         // when
-        when(concertJpaRepository.findByTitleContaining("Winter")).thenReturn(List.of(concert));
+        when(concertJpaRepository.findByTitleContaining("Winter", pageable)).thenReturn(concertPage);
 
-        // that
-        assertThat(concertService.findByTitle("Winter")).isEqualTo(List.of(concert));
+        // then
+        assertThat(concertService.findByTitle("Winter", 1, 5)).isEqualTo(concertPage);
     }
-
     @Test
     @DisplayName("해당 일자에 열리는 콘서트를 조회한다.")
     void findByDate() {
         // given
         LocalDate date = LocalDate.now();
         Concert concert = new Concert(1L, "Winter Concert", date);
+        List<Concert> concertList = List.of(concert);
+        Pageable pageable = PageRequest.of(1, 5, Sort.by("title").ascending());
+        Page<Concert> concertPage = new PageImpl<>(concertList, pageable, concertList.size());
         // when
-        when(concertJpaRepository.findByConcertDate(date)).thenReturn(List.of(concert));
+        when(concertJpaRepository.findByConcertDate(date, pageable)).thenReturn(concertPage);
 
         // that
-        assertThat(concertService.findByDate(date)).isEqualTo(List.of(concert));
+        assertThat(concertService.findByDate(date, 1, 5)).isEqualTo(concertPage);
     }
 
     @Test
