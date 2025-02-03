@@ -41,6 +41,9 @@ dependencies {
 	annotationProcessor("org.projectlombok:lombok")
 	implementation("org.springframework.retry:spring-retry")
 	implementation("org.springframework:spring-aspects")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 

@@ -7,6 +7,7 @@ import kr.hhplus.be.server.support.exception.ErrorMessages;
 import kr.hhplus.be.server.support.exception.InvalidIdException;
 import kr.hhplus.be.server.support.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,11 +33,16 @@ public class ConcertServiceImpl implements ConcertService {
     }
 
 
-
     @Override
     public Page<Concert> findByDate(LocalDate date, Integer offset, Integer limit) {
         Pageable pageable = PageRequest.of(offset, limit, Sort.by("title").ascending());  // 정렬 추가
         return concertJpaRepository.findByConcertDate(date, pageable);
+    }
+
+    @Override
+    @Cacheable(value = "concerts", key = "'concert:' + #date")
+    public List<Concert> findByDate(LocalDate date) {
+        return concertJpaRepository.findAllByClosestToToday(date);
     }
 
     @Override

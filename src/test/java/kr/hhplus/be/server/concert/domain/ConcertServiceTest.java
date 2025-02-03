@@ -79,4 +79,17 @@ class ConcertServiceTest {
         // when, that
         assertThatThrownBy(() ->concertService.getById(1L)).isInstanceOf(NotFoundException.class);
     }
+
+    @Test
+    @DisplayName("특정 일자로 콘서트를 조회한다.")
+    void GetById() {
+        // given
+        LocalDate date = LocalDate.now();
+        Concert concert = new Concert(1L, "Winter Concert", date);
+        List<Concert> concertList = List.of(concert);
+        // when
+        when(concertJpaRepository.findAllByClosestToToday(date)).thenReturn(concertList);
+        // that
+        assertThat(concertService.findByDate(date)).isEqualTo(concertList);
+    }
 }

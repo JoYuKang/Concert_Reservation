@@ -17,6 +17,9 @@ public interface ConcertService {
     // 날짜 조회
     Page<Concert> findByDate(LocalDate date, Integer offset, Integer limit);
 
+
+    List<Concert> findByDate(LocalDate date);
+
     // 콘서트 ID 조회
     Concert getById(Long id);
 }

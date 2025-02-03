@@ -15,9 +15,12 @@ INSERT INTO tb_token (token, status, created_at, expired_at) VALUES
                                                                 (UUID(), 'ACTIVE', NOW(), DATE_ADD(NOW(), INTERVAL 30 MINUTE));
 
 -- tb_concert basic data
-INSERT INTO tb_concert (title, concert_date) VALUES
-                                                ('Rock Festival', '2025-02-01'),
-                                                ('Jazz Night', '2025-03-15');
+INSERT INTO tb_concert (title, concert_date, created_at, updated_at) VALUES
+                                                                ('Rock Festival', '2025-02-01', NOW(), NOW()),
+                                                                ('Winter Festival', '2025-03-11', NOW(), NOW()),
+                                                                ('Winter Fishing Festival', '2025-03-15', NOW(), NOW()),
+                                                                ('Jazz Night', '2025-03-15', NOW(), NOW());
+
 
 -- tb_reservation basic data
 INSERT INTO tb_reservation (member_id, concert_id, total_amount, status) VALUES
