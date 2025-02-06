@@ -16,7 +16,7 @@ public class TokenExpireScheduler {
 
     private final TokenService tokenService;
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     @Transactional
     public void expiredTokens() {
         List<Token> expiredTokens = tokenService.findExpiredTokens();

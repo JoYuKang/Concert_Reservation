@@ -15,7 +15,7 @@ public class TokenActiveScheduler {
 
     private final TokenService tokenService;
 
-    @Scheduled(fixedRate = 5000)
+//    @Scheduled(fixedRate = 5000)
     @Transactional
     public void activateTokens() {
         List<Token> inactiveTokens = tokenService.findInactiveTokens();

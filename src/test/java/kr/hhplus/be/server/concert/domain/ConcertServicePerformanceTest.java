@@ -5,21 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
 
 
 @Slf4j
 @SpringBootTest
+@Sql(scripts = "/data.sql")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ConcertServicePerformanceTest {
 
