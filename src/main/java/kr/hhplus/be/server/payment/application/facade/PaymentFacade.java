@@ -15,6 +15,7 @@ import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.support.exception.ErrorMessages;
 import kr.hhplus.be.server.support.exception.ExpiredException;
 import kr.hhplus.be.server.support.exception.UnauthorizedReservationException;
+import kr.hhplus.be.server.token.application.service.TokenRedisService;
 import kr.hhplus.be.server.token.domain.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,8 @@ public class PaymentFacade {
     private final BalanceHistoryService balanceHistoryService;
 
     private final TokenService tokenService;
+
+    private final TokenRedisService tokenRedisService;
 
     @Transactional
     public Payment createPayment(Long memberId, PaymentRequest request, String token) {
@@ -61,7 +64,8 @@ public class PaymentFacade {
         reservationService.confirmReservation(reservation.getId());
 
         // 토큰 만료
-        tokenService.expire(token);
+//        tokenService.expire(token);
+        tokenRedisService.removeActiveToken(token);
 
         return payment;
     }
