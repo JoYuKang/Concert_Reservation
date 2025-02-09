@@ -13,20 +13,19 @@ import org.springframework.stereotype.Component;
 public class TokenRedisScheduler {
 
     private final TokenRedisService tokenRedisService;
-    private static final int BATCH_SIZE = 500; // 한 번에 활성화할 토큰 수
+    private static final int BATCH_SIZE = 20; // 한 번에 활성화할 토큰 수
+    private static final int MAX_BATCH_SIZE = 700; // 최대 활성화할 토큰 수
 
     @Transactional
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 5000)
     public void activateTokens() {
         log.info("Token activation scheduler started");
         Long currentActiveTokens = tokenRedisService.getActiveTokenCount();
 
-        if (currentActiveTokens < BATCH_SIZE) {
-            int tokensToActivate = Math.min(BATCH_SIZE, BATCH_SIZE - currentActiveTokens.intValue());
-            tokenRedisService.activateTokens(tokensToActivate);
-            log.info("Activated {} tokens", tokensToActivate);
+        if (currentActiveTokens < MAX_BATCH_SIZE) {
+            tokenRedisService.activateTokens(BATCH_SIZE);
         } else {
-            log.info("Maximum number of active tokens reached. No new tokens activated.");
+            log.info("최대 활성 토큰 수에 도달하여 새로운 토큰을 활성화하지 않음.");
         }
     }
 
