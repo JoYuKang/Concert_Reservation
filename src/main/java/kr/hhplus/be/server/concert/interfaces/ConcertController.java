@@ -41,5 +41,12 @@ public class ConcertController {
         return ResponseEntity.ok(concertService.findByTitle(title, offset, limit).map(ConcertResponse::new));
     }
 
+    // 콘서트 메인 페이지 조회
+    @GetMapping("/first/{date}")
+    public ResponseEntity<List<ConcertResponse>> getMainConcerts(
+            @PathVariable("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        return ResponseEntity.ok(concertService.findByDate(date).stream().map(ConcertResponse::new).toList());
+    }
+
 
 }
