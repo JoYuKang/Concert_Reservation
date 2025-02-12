@@ -23,9 +23,9 @@ INSERT INTO tb_concert (title, concert_date, created_at, updated_at) VALUES
 
 
 -- tb_reservation basic data
-INSERT INTO tb_reservation (member_id, concert_id, total_amount, status) VALUES
-    (1, 1, 20000, 'AWAITING_PAYMENT');
-
+INSERT INTO tb_reservation (member_id, concert_id, total_amount, status, created_at, updated_at) VALUES
+    (1, 1, 20000, 'AWAITING_PAYMENT', NOW(), NOW()),
+    (8, 2, 50000, 'AWAITING_PAYMENT', NOW(), NOW());
 -- tb_seat basic data
 INSERT INTO tb_seat (concert_id, position, amount, status, version) VALUES
                                                                 (1, 1, 10000, 'AVAILABLE', 0),

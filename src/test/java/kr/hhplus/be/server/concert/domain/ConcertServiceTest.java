@@ -33,7 +33,7 @@ class ConcertServiceTest {
     @DisplayName("유저가 입력한 값이 포함된 콘서트 이름을 반환한다.")
     void findByTitle() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Concert> concertList = List.of(concert);
         Pageable pageable = PageRequest.of(1, 5, Sort.by("concertDate").ascending());
         Page<Concert> concertPage = new PageImpl<>(concertList, pageable, concertList.size());
@@ -49,7 +49,7 @@ class ConcertServiceTest {
     void findByDate() {
         // given
         LocalDate date = LocalDate.now();
-        Concert concert = new Concert(1L, "Winter Concert", date);
+        Concert concert = new Concert(1L, "Winter Concert", date, "POP");
         List<Concert> concertList = List.of(concert);
         Pageable pageable = PageRequest.of(1, 5, Sort.by("title").ascending());
         Page<Concert> concertPage = new PageImpl<>(concertList, pageable, concertList.size());
@@ -64,7 +64,7 @@ class ConcertServiceTest {
     @DisplayName("콘서트 Id로 콘서트를 조회한다.")
     void getById() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
 
         // when
         when(concertJpaRepository.findById(1L)).thenReturn(Optional.of(concert));
@@ -85,7 +85,7 @@ class ConcertServiceTest {
     void GetById() {
         // given
         LocalDate date = LocalDate.now();
-        Concert concert = new Concert(1L, "Winter Concert", date);
+        Concert concert = new Concert(1L, "Winter Concert", date, "POP");
         List<Concert> concertList = List.of(concert);
         // when
         when(concertJpaRepository.findAllByClosestToToday(date)).thenReturn(concertList);
