@@ -15,13 +15,17 @@ import java.util.Date;
 @AllArgsConstructor
 public class ConcertResponse {
 
-    String title;
+    private String title;
 
-    LocalDate concertTime;
+    private LocalDate concertTime;
+
+    private String category;
+
 
     public ConcertResponse(Concert concert) {
         this.title =concert.getTitle();
         this.concertTime = concert.getConcertDate();
+        this.category = concert.getCategory();
     }
 
 }

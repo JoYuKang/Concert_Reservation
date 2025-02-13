@@ -30,4 +30,6 @@ public class Concert extends Timestamped {
     @JsonDeserialize(using = LocalDateDeserializer.class)  // LocalDate에 맞는 Deserializer 사용
     private LocalDate concertDate;
 
+    private String category;
+
 }

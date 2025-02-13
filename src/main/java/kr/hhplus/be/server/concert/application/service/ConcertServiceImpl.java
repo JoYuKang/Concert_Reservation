@@ -46,6 +46,12 @@ public class ConcertServiceImpl implements ConcertService {
     }
 
     @Override
+    public List<Concert> getUpcomingConcertsByCategory(String category) {
+        LocalDate today = LocalDate.now();
+        return concertJpaRepository.findUpcomingConcertsByCategory(category, today);
+    }
+
+    @Override
     public Concert getById(Long id) {
         if (id < 1) throw new InvalidIdException(ErrorMessages.INVALID_ID);
         return concertJpaRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorMessages.CONCERT_NOT_FOUND));

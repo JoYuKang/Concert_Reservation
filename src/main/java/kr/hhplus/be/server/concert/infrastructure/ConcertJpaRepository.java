@@ -20,4 +20,7 @@ public interface ConcertJpaRepository extends JpaRepository<Concert, Long> {
     @Query("SELECT c FROM Concert c WHERE c.concertDate >= :date ORDER BY c.concertDate ASC LIMIT 100")
     List<Concert> findAllByClosestToToday(@Param("date") LocalDate date);
 
+    @Query("SELECT c FROM Concert c WHERE c.category = :category AND c.concertDate >= :today ORDER BY c.concertDate ASC LIMIT 30")
+    List<Concert> findUpcomingConcertsByCategory(@Param("category") String category, @Param("today") LocalDate today);
+
 }

@@ -43,7 +43,7 @@ class ReservationServiceImplTest {
     void findByMemberId() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -60,7 +60,7 @@ class ReservationServiceImplTest {
     void save() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -77,7 +77,7 @@ class ReservationServiceImplTest {
     void confirmReservation() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -95,7 +95,7 @@ class ReservationServiceImplTest {
     void failedConfirmReservation() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -113,7 +113,7 @@ class ReservationServiceImplTest {
     void cancelReservation() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -131,7 +131,7 @@ class ReservationServiceImplTest {
     void failedCancelReservation() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
@@ -149,7 +149,7 @@ class ReservationServiceImplTest {
     void failedValidateReservation() throws NoSuchFieldException, IllegalAccessException {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);

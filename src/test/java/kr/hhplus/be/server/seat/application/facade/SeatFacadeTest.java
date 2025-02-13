@@ -39,7 +39,7 @@ class SeatFacadeTest {
     @DisplayName("콘서트의 좌석을 조회할 수 있다.")
     void getConcernedSeats() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
 
         // when

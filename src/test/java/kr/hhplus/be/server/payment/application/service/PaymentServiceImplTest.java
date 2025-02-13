@@ -38,7 +38,7 @@ class PaymentServiceImplTest {
     void create() {
         // given
         Member member = new Member(1L,"test member", 10000, 0);
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         List<Seat> seats = new ArrayList<>();
         Seat seat = new Seat(1L, concert, 15, 50000, SeatStatus.AVAILABLE, 0);
         seats.add(seat);
