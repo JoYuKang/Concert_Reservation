@@ -7,7 +7,7 @@ INSERT INTO tb_member (name, balance, version) VALUES
                                         ('Kong', 70000, 0),
                                         ('Hoo', 70000, 0),
                                         ('Ace', 70000, 0),
-                                        ('Nana', 70000, 0);
+                                        ('Nana', 30000, 0);
 
 -- tb_token basic data
 INSERT INTO tb_token (token, status, created_at, expired_at) VALUES

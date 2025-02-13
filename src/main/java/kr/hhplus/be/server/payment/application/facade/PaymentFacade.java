@@ -9,7 +9,9 @@ import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.payment.domain.Payment;
 import kr.hhplus.be.server.payment.domain.PaymentService;
 import kr.hhplus.be.server.payment.domain.PaymentStatus;
+import kr.hhplus.be.server.payment.interfaces.PaymentEventListener;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
+import kr.hhplus.be.server.payment.interfaces.response.PaymentEventMassage;
 import kr.hhplus.be.server.reservation.domain.Reservation;
 import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.support.exception.ErrorMessages;
@@ -18,6 +20,7 @@ import kr.hhplus.be.server.support.exception.UnauthorizedReservationException;
 import kr.hhplus.be.server.token.application.service.TokenRedisService;
 import kr.hhplus.be.server.token.domain.TokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,6 +41,8 @@ public class PaymentFacade {
     private final TokenService tokenService;
 
     private final TokenRedisService tokenRedisService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Payment createPayment(Long memberId, PaymentRequest request, String token) {
@@ -66,6 +71,9 @@ public class PaymentFacade {
         // 토큰 만료
 //        tokenService.expire(token);
         tokenRedisService.removeActiveToken(token);
+
+        // 이벤트 발행 (결제가 성공적으로 완료된 후)
+        eventPublisher.publishEvent(new PaymentEventMassage(payment));
 
         return payment;
     }
