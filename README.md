@@ -23,7 +23,9 @@
 ### [ERD](https://github.com/JoYuKang/Concert_Reservation/blob/main/docs/ERD.md)
 ### [API 명세서](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/API%20%EB%AA%85%EC%84%B8%EC%84%9C.md)
 ### [플로우차트](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/%ED%94%8C%EB%A1%9C%EC%9A%B0%20%EC%B0%A8%ED%8A%B8.md)
-### [콘서트 조회 성능 개선 보고서](#콘서트-조회-성능-개선-보고서)
+
+[//]: # (### [콘서트 조회 성능 개선 보고서]&#40;#콘서트-조회-성능-개선-보고서&#41;)
+[//]: # (### [서비스의 규모 확장을 위한 MSA 적용 방식 정리]&#40;#서비스의-규모-확장을-위한-MSA-적용-방식-정리&#41;)
 ## 페키지 구조
 ```
 src/
@@ -568,3 +570,137 @@ ON tb_concert (category, concert_date);
 
 - **단순 조회 대비 인덱스를 사용한 조회가 평균적으로 98% 이상 빠르다.**
 - **대량 데이터 환경에서 인덱스는 필수적이라고 생각하고 WHERE + ORDER BY + LIMIT 구조에서 매우 효과적이라는 것을 알 수 있었습니다.**
+---
+
+## 서비스의 규모 확장을 위한 MSA 적용 방식 정리
+
+### **Saga 패턴이란?**
+
+**Saga 패턴은 MSA에서 분산 트랜잭션의 데이터 일관성을 유지하기 위한 트랜잭션 관리 기법이다.**
+
+### 🎯 **왜 Saga 패턴이 필요한가?**
+
+MSA 환경에서는 각 마이크로서비스가 **자신의 로컬 데이터베이스를 관리**하기 때문에, 기존처럼 **단일 데이터베이스에서 트랜잭션을 유지할 수 없다**. 이 말은 **DBMS가 제공하는 전통적인 트랜잭션 방식이 적용되지 않으면 기존 DBMS를 기준으로 설계된 서비스에서 장애가 발생 시 데이터 불일치 문제가 발생할 수 있다.**
+
+### 🎯 **Saga 패턴의 핵심 개념**
+
+- **하나의 전체 트랜잭션을 여러 개의 로컬 트랜잭션으로 분할**하여 처리된다.
+- **각 로컬 트랜잭션은 독립적으로 실행되며, 모든 트랜잭션이 성공해야 성공으로 간주하고 아니면 실패한다.**
+- 만약 중간에 **트랜잭션이 실패하면 이전에 완료된 트랜잭션을 취소하기 위해 보상 트랜잭션이 실행된다.**
+- **보상 트랜잭션을** 통해 **데이터 일관성을 유지하면서도 분산 환경에서 유연한 트랜잭션 관리한다.**
+
+### 📝 한 줄 정리
+
+Saga 패턴은 MSA 환경에서 **분산 트랜잭션을 효과적으로 관리하는 필수적인 기법**이다.
+
+### 🎯 **Saga 패턴의 두 가지 방식**
+
+### 1. **오케스트레이션(Orchestration) 방식**
+
+- Coordinator가 각 서비스의 트랜잭션을 순차적으로 관리하는 방식
+- Coordinator가 트랜잭션 성공 여부를 확인하고 다음 단계로 진행하는 중앙 집중형 컨트롤 방식
+- 장애 발생 시 **Coordinator가 보상 트랜잭션을 호출하여 롤백**
+
+### 🔹 장점
+
+- 중앙 관리로 인해 **트랜잭션 흐름이 명확함**
+- **데이터 정합성이 유지되기 쉬움**
+
+### 🔹 단점
+
+- **Coordinator가 단일 장애점이 될 가능성이 있음**
+- 새로운 서비스 추가 시 Coordinator 수정 필요하여 확장 시 제한됨
+
+#### 구현 방식
+
+![image](https://github.com/user-attachments/assets/92b54a1a-0f0b-4dfe-a4ff-5e6f6361cf54)
+
+
+### 2. **코레오그래피(Choreography) 방식**
+
+- **Message Broker**를 활용하여 서비스 간 **이벤트 기반으로 트랜잭션을 처리하는 방식**
+- 서비스들은 독립적으로 이벤트를 발행하고, 필요한 서비스가 해당 이벤트를 구독해서 동작
+- 중앙 Coordinator 없어 서비스 간 **이벤트를 기반으로 트랜잭션을 관리**
+
+### 🔹 장점
+
+- **확장성이 뛰어나고, 단일 장애점 문제가 없음**
+- **트래픽 증가에도 안정적인 운영 가능**
+
+### 🔹 단점
+
+- 서비스 간 **이벤트 흐름을 관리하기가 어려움**
+- 데이터 정합성을 맞추는 로직이 필요함
+
+구현방식
+![image](https://github.com/user-attachments/assets/fdc4910c-9e18-45c4-b604-d622599f26ca)
+
+
+### 📝 한 줄 정리
+
+오케스트레이션은 Coordinator 중심, 코레오그래피는 Message Broker 중심의 이벤트 기반 방식이다.
+
+## 콘서트 서비스의 핵심은 예약이다.
+
+### 기존 코드
+```java
+@Service
+public class ReservationFacade {
+	// 좌석 예약
+	@Transactional
+	public Reservation createReservation(ReservationRequest request) {
+	
+	    // member 확인
+	    Member member = memberService.findById(request.getMemberId());
+	
+	    // concert 확인
+	    Concert concert = concertService.getById(request.getConcertId());
+	
+	    // 판매중인 Seat 확인
+	    List<Seat> seats = seatService.searchSeat(request.getConcertId(), request.getSeatNumbers());
+	
+	    // 예약 결제대기 저장
+	    Reservation reservation = new Reservation(member, concert, seats);
+	
+	    return reservationService.save(reservation);
+	}
+}
+```
+위 코드를 MSA로 분리하기 위해서 Reservation, Member, Concert, Seat 서비스가 서로 직접 호출하지 않고, 이벤트 기반으로 연동되도록 변경해야한다.
+### 변경 예시
+```java
+@Service
+public class ReservationService {
+    
+    @Autowired
+    private EventPublisher eventPublisher;
+
+    @EventListener
+    public void handleSeatsReserved(SeatsReservedEvent event) {
+        // 좌석 예약이 성공적으로 완료되었을 때 최종 예약 확정
+        Reservation reservation = new Reservation(event.getMemberId(), event.getConcertId(), event.getSeatNumbers());
+        save(reservation);
+
+        // 예약 완료 이벤트 발행
+        eventPublisher.publish(new ReservationCompletedEvent(event.getMemberId(), event.getConcertId()));
+    }
+}
+```
+
+## 🎯 최종 선택 [코레오그래피]
+
+### **코레오그래피 방식이 더 적합한 이유**
+
+1. **고성능 및 확장성 확보**
+    - 중앙 Coordinator 없이 **이벤트 기반**으로 동작하여 트래픽이 급증해도 자연스럽게 분산 처리 가능
+    - 새로운 서비스 추가 시 기존 서비스 코드 변경 없이 새로운 이벤트 리스너만 추가하여 서비스 확장 가능
+2. **장애 대응력 향상**
+    - 특정 서비스 장애 발생 시 전체 예약 프로세스가 중단되지 않고, 개별 서비스에서 장애를 복구 가능
+    - Coordinator에 장애 발생 시 서비스 전체가 멈출 위험 존재
+3. **트랜잭션 흐름의 유연성**
+    - 기존 방식처럼 모든 서비스가 동기적으로 호출되지 않기 때문에 **비동기 처리를 통한 성능 최적화** 가능.
+
+### 📝 정리
+**오케스트레이션** 방식은 **흐름이 명확하지만 단일 장애점 문제가 있을 수 있어**
+**코레오그래피** 방식은 **확장성과 장애 대응력이 뛰어나지만 이벤트 관리가 복잡할 수 있지만** **트래픽이 많고 장애 회복력이 중요한 서비스(예: 결제, 예매 시스템)에서는 코레오그래피 방식이 더 적합하다고 판단됩니다.**
+
