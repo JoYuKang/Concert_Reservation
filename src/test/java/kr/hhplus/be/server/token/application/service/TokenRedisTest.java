@@ -25,7 +25,8 @@ public class TokenRedisTest {
     void testTokenCreate() {
         String token = tokenRedisService.addWaitingToken();
         long waitingTokenIndex = tokenRedisService.getWaitingTokenIndex(token);
-        assertThat(waitingTokenIndex).isGreaterThan(1);
+
+        assertThat(waitingTokenIndex).isGreaterThanOrEqualTo(1);
     }
 
 

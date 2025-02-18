@@ -34,7 +34,7 @@ class SeatServiceImplTest {
     @DisplayName("콘서트의 좌석을 조회할 수 있다.")
     void getConcernedSeats() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         Seat seat = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
         // when
         when(seatJpaRepository.findByConcertAndStatus(concert, SeatStatus.AVAILABLE)).thenReturn(List.of(seat));
@@ -46,7 +46,7 @@ class SeatServiceImplTest {
     @DisplayName("콘서트의 에약 가능한 좌석이 없다면 공백을 리턴한다.")
     void getConcernedSeatsZero() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         // when
         when(seatJpaRepository.findByConcertAndStatus(concert, SeatStatus.AVAILABLE)).thenReturn(List.of());
         // then
@@ -57,7 +57,7 @@ class SeatServiceImplTest {
     @DisplayName("좌석 예약 중 매진된 좌석이 있다면 예약에 실패한다.")
     void failedGetConcernedSeats() {
         // given
-        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now());
+        Concert concert = new Concert(1L, "Winter Concert", LocalDate.now(), "POP");
         Seat seat1 = new Seat(1L, concert, 14, 50000, SeatStatus.AVAILABLE, 0);
         Seat seat2 = new Seat(2L, concert, 15, 50000, SeatStatus.SOLD_OUT, 0);
 

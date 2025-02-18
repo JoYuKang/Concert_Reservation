@@ -23,6 +23,9 @@
 ### [ERD](https://github.com/JoYuKang/Concert_Reservation/blob/main/docs/ERD.md)
 ### [API 명세서](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/API%20%EB%AA%85%EC%84%B8%EC%84%9C.md)
 ### [플로우차트](https://github.com/JoYuKang/Concert_Reservation/blob/docs/docs/%ED%94%8C%EB%A1%9C%EC%9A%B0%20%EC%B0%A8%ED%8A%B8.md)
+
+[//]: # (### [콘서트 조회 성능 개선 보고서]&#40;#콘서트-조회-성능-개선-보고서&#41;)
+[//]: # (### [서비스의 규모 확장을 위한 MSA 적용 방식 정리]&#40;#서비스의-규모-확장을-위한-MSA-적용-방식-정리&#41;)
 ## 페키지 구조
 ```
 src/
@@ -461,3 +464,243 @@ List<Concert> findAllByClosestToToday(@Param("date") LocalDate date);
 - 현재 4,000건의 요청은 초당 66.8건 처리되어 1분(60초) 내에 모두 처리
 - 하지만, 10,000명 사용자를 목표로 할 경우 초당 166건 이상의 요청 처리가 필요
 - 토큰 활성화 전략을 **5초당 20명 활성화**로 조정하여, 사용자가 점진적으로 콘서트 조회, 좌석 조회, 예약 등의 작업을 수행하게 함으로써 부하를 안정적으로 분산
+
+---
+
+## **콘서트 조회 성능 개선 보고서**
+
+### **✅** 카테고리별 분류된 콘서트를 일자가 가까운 순으로 조회하는 쿼리
+
+```sql
+SELECT c 
+FROM Concert c 
+WHERE c.category = :category 
+  AND c.concertDate >= :today 
+ORDER BY c.concertDate ASC 
+LIMIT 30;
+```
+
+### 쿼리 선정 이유
+
+- **사용 빈도가 높은 핵심 기능**: 특정 카테고리별 최신 콘서트를 조회하는 기능은 사용자가 자주 활용할 가능성이 높음
+- **성능 최적화 필요**: 데이터가 증가할수록 성능 저하가 예상되므로 인덱스를 활용한 최적화가 필요
+- **ORDER BY + LIMIT 구조**: 최신 콘서트 30개만 빠르게 조회하기 위해 정렬 및 최적화 필요
+
+### **✅** 인덱스 설정
+
+```sql
+CREATE INDEX idx_concert_category_date 
+ON tb_concert (category, concert_date);
+```
+
+### **📌 인덱스 적용 이유**
+
+- **WHERE 조건 최적화**
+   - `category`가 특정 값으로만 필터링 (예: "Rock", "Jazz" 등)
+   - `concertDate`가 오늘 이후의 데이터만 조회
+- **복합 인덱스(category, concertDate)의 장점**
+   - `category` 단일 인덱스만 있을 경우 `concertDate` 필터링 시 추가적인 테이블 스캔 발생
+   - `concertDate` 단일 인덱스만 있을 경우 `category` 필터링이 최적화 불가
+   - 복합 인덱스를 사용하면 **category 필터링 후, concertDate 정렬이 즉시 수행**되어 불필요한 정렬 연산을 피할 수 있다
+- **ORDER BY 최적화**
+   - `concertDate ASC` 정렬을 위해 인덱스를 활용하여 정렬 비용을 최소화 가능
+- **LIMIT 최적화**
+   - 인덱스를 활용하여 필요 데이터만 빠르게 조회 가능
+
+### **📊 인덱스 추가 전후 성능 비교 분석**
+
+| 항목 | 인덱스 사용 (range) | 인덱스 없음 (ALL) |
+| --- | --- | --- |
+| **type** |  부분 범위 검색 | Full Table Scan |
+| **possible_keys** | `idx_concert_category_date` | `NULL` |
+| **key (사용된 인덱스)** | `idx_concert_category_date` | `NULL` |
+| **rows (탐색 레코드 수)** | 1,965 | 696,873 |
+| **Extra** | `Using index condition` (인덱스를 사용한 필터링) | `Using where; Using filesort` (전체 검색 + 정렬) |
+| **성능** | ✅ 최적화 | 🚨 성능 저하  |
+
+### **1️⃣ 성능 비교 결과**
+
+| | 일반 조회         | Index 조회      |  
+|----------|---------------|---------------| 
+| Query_ID | Duration(sec) | Duration(sec) |
+| 1        | 0.253357      | 0.0256965     |
+| 2        | 0.24083475    | 0.00165875    |
+| 3        | 0.1990175     | 0.001483      |
+| 4        | 0.19270775    | 0.0016495     |
+| 5        | 0.19753225    | 0.00088       |
+| 6        | 0.19948975    | 0.0026395     |
+| 7        | 0.19033125    | 0.00276575    |
+| 8        | 0.19221575    | 0.00127775    |
+| 9        | 0.2006435     | 0.001577      |
+| 10       | 0.192198      | 0.001149      |
+| 평균       | 0.20583275    | 0.004077675   |
+
+### **인덱스 적용 후 평균 실행 속도 감소 비율:**
+
+| **조회 방식** | **평균 실행 시간 (초)** |
+| --- | --- |
+| **일반 조회 (인덱스 없음)** | **0.2058 초** |
+| **인덱스 사용 조회** | **0.0041 초** |
+
+### **세부적인 분석**
+
+- **최악의 경우 (`0.2534` 초 → `0.0257` 초)**
+   - **약 10배 향상**
+- **최상의 경우 (`0.1903` 초 → `0.00088` 초)**
+   - **약 200배 향상**
+- **전반적으로 모든 쿼리가 `0.005초` 이하로 단축됨**
+
+
+### **왜 이렇게 차이가 발생했는가?**
+
+✅ **인덱스 적용 전**
+
+- **Full Table Scan (ALL) 발생** → 불필요한 레코드 탐색으로 실행 속도 저하
+- **정렬 과정에서 추가적인 filesort 발생** → 정렬 연산 비용 증가
+
+✅ **인덱스 적용 후**
+
+- **복합 인덱스(category, concertDate) 활용**
+   - `category` 필터링 후 `concertDate` 기준 정렬 최적화
+   - **불필요한 정렬 연산 제거** → filesort 방지
+   - **빠른 페이징 처리 가능 (LIMIT 30 최적화)**
+
+
+### **✅ 결론**
+
+- **단순 조회 대비 인덱스를 사용한 조회가 평균적으로 98% 이상 빠르다.**
+- **대량 데이터 환경에서 인덱스는 필수적이라고 생각하고 WHERE + ORDER BY + LIMIT 구조에서 매우 효과적이라는 것을 알 수 있었습니다.**
+---
+
+## 서비스의 규모 확장을 위한 MSA 적용 방식 정리
+
+### **Saga 패턴이란?**
+
+**Saga 패턴은 MSA에서 분산 트랜잭션의 데이터 일관성을 유지하기 위한 트랜잭션 관리 기법이다.**
+
+### 🎯 **왜 Saga 패턴이 필요한가?**
+
+MSA 환경에서는 각 마이크로서비스가 **자신의 로컬 데이터베이스를 관리**하기 때문에, 기존처럼 **단일 데이터베이스에서 트랜잭션을 유지할 수 없다**. 이 말은 **DBMS가 제공하는 전통적인 트랜잭션 방식이 적용되지 않으면 기존 DBMS를 기준으로 설계된 서비스에서 장애가 발생 시 데이터 불일치 문제가 발생할 수 있다.**
+
+### 🎯 **Saga 패턴의 핵심 개념**
+
+- **하나의 전체 트랜잭션을 여러 개의 로컬 트랜잭션으로 분할**하여 처리된다.
+- **각 로컬 트랜잭션은 독립적으로 실행되며, 모든 트랜잭션이 성공해야 성공으로 간주하고 아니면 실패한다.**
+- 만약 중간에 **트랜잭션이 실패하면 이전에 완료된 트랜잭션을 취소하기 위해 보상 트랜잭션이 실행된다.**
+- **보상 트랜잭션을** 통해 **데이터 일관성을 유지하면서도 분산 환경에서 유연한 트랜잭션 관리한다.**
+
+### 📝 한 줄 정리
+
+Saga 패턴은 MSA 환경에서 **분산 트랜잭션을 효과적으로 관리하는 필수적인 기법**이다.
+
+### 🎯 **Saga 패턴의 두 가지 방식**
+
+### 1. **오케스트레이션(Orchestration) 방식**
+
+- Coordinator가 각 서비스의 트랜잭션을 순차적으로 관리하는 방식
+- Coordinator가 트랜잭션 성공 여부를 확인하고 다음 단계로 진행하는 중앙 집중형 컨트롤 방식
+- 장애 발생 시 **Coordinator가 보상 트랜잭션을 호출하여 롤백**
+
+### 🔹 장점
+
+- 중앙 관리로 인해 **트랜잭션 흐름이 명확함**
+- **데이터 정합성이 유지되기 쉬움**
+
+### 🔹 단점
+
+- **Coordinator가 단일 장애점이 될 가능성이 있음**
+- 새로운 서비스 추가 시 Coordinator 수정 필요하여 확장 시 제한됨
+
+#### 구현 방식
+
+![image](https://github.com/user-attachments/assets/92b54a1a-0f0b-4dfe-a4ff-5e6f6361cf54)
+
+
+### 2. **코레오그래피(Choreography) 방식**
+
+- **Message Broker**를 활용하여 서비스 간 **이벤트 기반으로 트랜잭션을 처리하는 방식**
+- 서비스들은 독립적으로 이벤트를 발행하고, 필요한 서비스가 해당 이벤트를 구독해서 동작
+- 중앙 Coordinator 없어 서비스 간 **이벤트를 기반으로 트랜잭션을 관리**
+
+### 🔹 장점
+
+- **확장성이 뛰어나고, 단일 장애점 문제가 없음**
+- **트래픽 증가에도 안정적인 운영 가능**
+
+### 🔹 단점
+
+- 서비스 간 **이벤트 흐름을 관리하기가 어려움**
+- 데이터 정합성을 맞추는 로직이 필요함
+
+구현방식
+![image](https://github.com/user-attachments/assets/fdc4910c-9e18-45c4-b604-d622599f26ca)
+
+
+### 📝 한 줄 정리
+
+오케스트레이션은 Coordinator 중심, 코레오그래피는 Message Broker 중심의 이벤트 기반 방식이다.
+
+## 콘서트 서비스의 핵심은 예약이다.
+
+### 기존 코드
+```java
+@Service
+public class ReservationFacade {
+	// 좌석 예약
+	@Transactional
+	public Reservation createReservation(ReservationRequest request) {
+	
+	    // member 확인
+	    Member member = memberService.findById(request.getMemberId());
+	
+	    // concert 확인
+	    Concert concert = concertService.getById(request.getConcertId());
+	
+	    // 판매중인 Seat 확인
+	    List<Seat> seats = seatService.searchSeat(request.getConcertId(), request.getSeatNumbers());
+	
+	    // 예약 결제대기 저장
+	    Reservation reservation = new Reservation(member, concert, seats);
+	
+	    return reservationService.save(reservation);
+	}
+}
+```
+위 코드를 MSA로 분리하기 위해서 Reservation, Member, Concert, Seat 서비스가 서로 직접 호출하지 않고, 이벤트 기반으로 연동되도록 변경해야한다.
+### 변경 예시
+```java
+@Service
+public class ReservationService {
+    
+    @Autowired
+    private EventPublisher eventPublisher;
+
+    @EventListener
+    public void handleSeatsReserved(SeatsReservedEvent event) {
+        // 좌석 예약이 성공적으로 완료되었을 때 최종 예약 확정
+        Reservation reservation = new Reservation(event.getMemberId(), event.getConcertId(), event.getSeatNumbers());
+        save(reservation);
+
+        // 예약 완료 이벤트 발행
+        eventPublisher.publish(new ReservationCompletedEvent(event.getMemberId(), event.getConcertId()));
+    }
+}
+```
+
+## 🎯 최종 선택 [코레오그래피]
+
+### **코레오그래피 방식이 더 적합한 이유**
+
+1. **고성능 및 확장성 확보**
+    - 중앙 Coordinator 없이 **이벤트 기반**으로 동작하여 트래픽이 급증해도 자연스럽게 분산 처리 가능
+    - 새로운 서비스 추가 시 기존 서비스 코드 변경 없이 새로운 이벤트 리스너만 추가하여 서비스 확장 가능
+2. **장애 대응력 향상**
+    - 특정 서비스 장애 발생 시 전체 예약 프로세스가 중단되지 않고, 개별 서비스에서 장애를 복구 가능
+    - Coordinator에 장애 발생 시 서비스 전체가 멈출 위험 존재
+3. **트랜잭션 흐름의 유연성**
+    - 기존 방식처럼 모든 서비스가 동기적으로 호출되지 않기 때문에 **비동기 처리를 통한 성능 최적화** 가능.
+
+### 📝 정리
+**오케스트레이션** 방식은 **흐름이 명확하지만 단일 장애점 문제가 있을 수 있어**
+**코레오그래피** 방식은 **확장성과 장애 대응력이 뛰어나지만 이벤트 관리가 복잡할 수 있지만** **트래픽이 많고 장애 회복력이 중요한 서비스(예: 결제, 예매 시스템)에서는 코레오그래피 방식이 더 적합하다고 판단됩니다.**
+
