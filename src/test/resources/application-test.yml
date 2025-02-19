@@ -23,3 +23,14 @@ spring:
     redis:
       host: localhost
       port: 6380
+  kafka:
+    consumer:
+      group-id: test-consumer-group
+      bootstrap-servers: ${KAFKA_BROKER}  # 테스트 중 Kafka의 실제 주소로 설정
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer

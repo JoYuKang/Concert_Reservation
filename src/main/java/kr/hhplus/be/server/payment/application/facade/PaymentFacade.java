@@ -9,6 +9,7 @@ import kr.hhplus.be.server.member.domain.MemberService;
 import kr.hhplus.be.server.payment.domain.Payment;
 import kr.hhplus.be.server.payment.domain.PaymentService;
 import kr.hhplus.be.server.payment.domain.PaymentStatus;
+import kr.hhplus.be.server.payment.infrastructure.kafka.PaymentKafkaProducer;
 import kr.hhplus.be.server.payment.interfaces.PaymentEventListener;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
 import kr.hhplus.be.server.payment.interfaces.response.PaymentEventMassage;
@@ -44,6 +45,8 @@ public class PaymentFacade {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final PaymentKafkaProducer paymentKafkaProducer;
+
     @Transactional
     public Payment createPayment(Long memberId, PaymentRequest request, String token) {
 
@@ -69,11 +72,11 @@ public class PaymentFacade {
         reservationService.confirmReservation(reservation.getId());
 
         // 토큰 만료
-//        tokenService.expire(token);
         tokenRedisService.removeActiveToken(token);
 
-        // 이벤트 발행 (결제가 성공적으로 완료된 후)
-        eventPublisher.publishEvent(new PaymentEventMassage(payment));
+        // 이벤트 발행 (결제가 성공적으로 완료된 후) Kafka로 변경
+//        eventPublisher.publishEvent(new PaymentEventMassage(payment));
+        paymentKafkaProducer.sendPaymentEvent(new PaymentEventMassage(payment));
 
         return payment;
     }
