@@ -71,12 +71,6 @@ class PaymentFacadeTest {
 
         // then
         assertThat(balance - amount).isEqualTo(reduceBalance);
-        // await()을 사용하여 비동기 이벤트가 처리된 후 로그가 기록되었는지 확인
-        await().atMost(3, SECONDS).untilAsserted(() -> {
-            // 비동기 이벤트가 처리된 후 로그에서 해당 이벤트를 찾을 수 있어야 합니다.
-            assertThat(paymentEventListener).isNotNull();
-        });
-
     }
 
     @Test
