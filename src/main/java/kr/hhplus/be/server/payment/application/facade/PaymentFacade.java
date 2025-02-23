@@ -36,7 +36,7 @@ public class PaymentFacade {
     public Payment createPayment(Long memberId, PaymentRequest request, String token) {
 
         // 맴버 확인
-        memberService.findById(memberId);
+        Member member = memberService.findById(memberId);
 
         // 예약 확인
         Reservation reservation = reservationService.getReservationById(request.getReservationId(), memberId);
@@ -60,7 +60,7 @@ public class PaymentFacade {
         tokenRedisService.removeActiveToken(token);
 
         // 이벤트 발행 (결제가 성공적으로 완료된 후) Kafka로 변경
-        paymentOutboxService.saveOutboxMessage(payment);
+        paymentOutboxService.saveOutboxMessage(member, payment);
 
         return payment;
     }

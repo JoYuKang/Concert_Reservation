@@ -3,7 +3,9 @@ package kr.hhplus.be.server.payment.event.outbox;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
+import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.payment.domain.Payment;
+import kr.hhplus.be.server.payment.interfaces.response.PaymentEventMassage;
 import kr.hhplus.be.server.support.common.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +25,8 @@ public class PaymentOutboxMessage extends Timestamped {
 
     private String eventType; // 이벤트 유형 (ex: "PAYMENT_COMPLETED")
 
+    private Long memberId;
+
     private Long paymentId;
 
     @Lob
@@ -34,15 +38,18 @@ public class PaymentOutboxMessage extends Timestamped {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // Payment 객체를 받아 JSON 변환
-    public PaymentOutboxMessage(Payment payment) {
+    public PaymentOutboxMessage(Member member, Payment payment) {
         this.eventType = "PAYMENT_COMPLETED"; // 기본 이벤트 타입
+        this.memberId = member.getId();
         this.paymentId = payment.getId();
         this.status = PaymentMessageStatus.PENDING;
 
+        PaymentEventMassage eventMassage = new PaymentEventMassage(member, payment);
+
         try {
-            this.payload = objectMapper.writeValueAsString(payment); // JSON 변환
+            this.payload = objectMapper.writeValueAsString(eventMassage); // JSON 변환
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Payment 객체를 JSON으로 변환하는 중 오류 발생", e);
+            throw new RuntimeException("Payment eventMassage 객체를 JSON으로 변환하는 중 오류 발생", e);
         }
     }
 

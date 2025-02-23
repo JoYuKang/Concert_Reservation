@@ -2,6 +2,7 @@ package kr.hhplus.be.server.payment.event.outbox;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.payment.domain.Payment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +22,8 @@ public class PaymentOutboxService {
 
     // Payment 엔티티 받아서 OutboxMessage 생성 및 저장
     @Transactional
-    public void saveOutboxMessage(Payment payment) {
-        PaymentOutboxMessage outboxMessage = new PaymentOutboxMessage(payment);
+    public void saveOutboxMessage(Member member, Payment payment) {
+        PaymentOutboxMessage outboxMessage = new PaymentOutboxMessage(member, payment);
         outboxRepository.save(outboxMessage);
     }
 

@@ -3,6 +3,8 @@ package kr.hhplus.be.server.payment.application.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.hhplus.be.server.member.domain.Member;
+import kr.hhplus.be.server.member.infrastructure.MemberJpaRepository;
 import kr.hhplus.be.server.payment.domain.Payment;
 import kr.hhplus.be.server.payment.event.outbox.PaymentMessageStatus;
 import kr.hhplus.be.server.payment.event.outbox.PaymentOutboxMessage;
@@ -10,6 +12,7 @@ import kr.hhplus.be.server.payment.event.outbox.PaymentOutboxRepository;
 import kr.hhplus.be.server.payment.event.outbox.PaymentOutboxService;
 import kr.hhplus.be.server.payment.infrastructure.PaymentJpaRepository;
 import kr.hhplus.be.server.payment.interfaces.request.PaymentRequest;
+import kr.hhplus.be.server.payment.interfaces.response.PaymentEventMassage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -31,10 +34,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -66,6 +68,9 @@ public class PaymentKafkaTest {
     @Autowired
     private PaymentOutboxService paymentOutboxService;
 
+    @Autowired
+    private MemberJpaRepository memberJpaRepository;
+
     private String receivedMessage;
 
     // 카프카 메시지 리스너
@@ -92,8 +97,10 @@ public class PaymentKafkaTest {
     void testKafkaMessageSendAndReceive() throws JsonProcessingException {
         // Given
         Payment payment = paymentJpaRepository.findById(1L).get();
-        PaymentOutboxMessage outboxMessage = new PaymentOutboxMessage(payment);
+        Member member = memberJpaRepository.findById(8L).get();
+        PaymentOutboxMessage outboxMessage = new PaymentOutboxMessage(member, payment);
         paymentOutboxRepository.save(outboxMessage);
+        PaymentEventMassage paymentEventMassage = new PaymentEventMassage(member, payment);
 
         // When
         paymentOutboxService.publishPendingMessages();
@@ -109,7 +116,7 @@ public class PaymentKafkaTest {
 
                     // JSON 직렬화된 메시지를 비교하기 위해 ObjectMapper 사용
                     ObjectMapper objectMapper = new ObjectMapper();
-                    String message = objectMapper.writeValueAsString(payment);
+                    String message = objectMapper.writeValueAsString(paymentEventMassage);
                     Map<String, Object> sentMap = objectMapper.readValue(message, new TypeReference<Map<String, Object>>() {});
                     Map<String, Object> receivedMap = objectMapper.readValue(receivedMessage, new TypeReference<Map<String, Object>>() {});
 
