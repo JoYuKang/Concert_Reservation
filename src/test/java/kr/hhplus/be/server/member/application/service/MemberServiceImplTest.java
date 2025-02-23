@@ -7,8 +7,10 @@ import kr.hhplus.be.server.balanceHistory.infrastructure.BalanceHistoryJpaReposi
 import kr.hhplus.be.server.member.application.facade.MemberFacade;
 import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.member.infrastructure.MemberJpaRepository;
+import kr.hhplus.be.server.member.interfaces.dto.request.MemberCreateRequest;
 import kr.hhplus.be.server.member.interfaces.dto.request.MemberRequest;
 import kr.hhplus.be.server.support.exception.AmountInvalidException;
+import kr.hhplus.be.server.support.exception.DuplicateException;
 import kr.hhplus.be.server.support.exception.NotFoundException;
 import org.junit.Before;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,5 +89,30 @@ class MemberServiceImplTest {
 
         // then
         assertThatThrownBy(() -> memberService.chargeBalance(request)).isInstanceOf(AmountInvalidException.class);
+    }
+
+    @Test
+    @DisplayName("유저를 생성한다.")
+    void createMember() {
+        // given
+        Member member = new Member(1L, "test members" , 0, 0);
+        MemberCreateRequest request = new MemberCreateRequest("test members");
+        when(memberJpaRepository.findByName("test members")).thenReturn(List.of());
+        when(memberJpaRepository.save(any(Member.class))).thenReturn(member);
+
+        // then
+        assertThat(memberService.createMember(request)).isEqualTo(request.getName());
+    }
+
+    @Test
+    @DisplayName("이름이 중복되면 유저 생성에 실패한다.")
+    void failedCreateMember() {
+        // given
+        Member member = new Member(1L, "test member" , 10000, 0);
+        MemberCreateRequest request = new MemberCreateRequest("test member");
+        when(memberJpaRepository.findByName("test member")).thenReturn(List.of(member));
+
+        // then
+        assertThatThrownBy(() -> memberService.createMember(request)).isInstanceOf(DuplicateException.class);
     }
 }

@@ -25,6 +25,7 @@ public class ErrorMessages {
 
     // 유저 관련 에러 메시지
     public static final String MEMBER_NOT_FOUND = "사용자를 찾을 수 없습니다.";
+    public static final String DUPLICATED_MEMBER = "중복된 이름은 사용할 수 없습니다.";
 
     // 콘서트 관련 에러 메시지
     public static final String CONCERT_NOT_FOUND = "콘서트를 찾을 수 없습니다.";

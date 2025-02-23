@@ -3,6 +3,7 @@ package kr.hhplus.be.server.member.interfaces;
 import jakarta.validation.Valid;
 import kr.hhplus.be.server.member.application.facade.MemberFacade;
 import kr.hhplus.be.server.member.domain.MemberService;
+import kr.hhplus.be.server.member.interfaces.dto.request.MemberCreateRequest;
 import kr.hhplus.be.server.member.interfaces.dto.request.MemberRequest;
 import kr.hhplus.be.server.member.interfaces.dto.response.MemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,13 @@ public class MemberController {
     public ResponseEntity<Integer> charge(@Valid @RequestBody MemberRequest request) {
 
         return new ResponseEntity<>(memberFacade.chargeBalanceWithHistory(request), HttpStatus.OK);
+    }
+
+    // 맴버 잔액 충전
+    @PostMapping("/create")
+    public ResponseEntity<String> create(@Valid @RequestBody MemberCreateRequest request) {
+
+        return new ResponseEntity<>(memberService.createMember(request), HttpStatus.OK);
     }
 
 }

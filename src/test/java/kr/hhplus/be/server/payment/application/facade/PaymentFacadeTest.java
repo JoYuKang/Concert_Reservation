@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.context.TestConstructor;
 import org.springframework.test.context.jdbc.Sql;
@@ -72,12 +71,6 @@ class PaymentFacadeTest {
 
         // then
         assertThat(balance - amount).isEqualTo(reduceBalance);
-        // await()을 사용하여 비동기 이벤트가 처리된 후 로그가 기록되었는지 확인
-        await().atMost(3, SECONDS).untilAsserted(() -> {
-            // 비동기 이벤트가 처리된 후 로그에서 해당 이벤트를 찾을 수 있어야 합니다.
-            assertThat(paymentEventListener).isNotNull();
-        });
-
     }
 
     @Test

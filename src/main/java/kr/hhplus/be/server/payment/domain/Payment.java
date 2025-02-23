@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.payment.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import kr.hhplus.be.server.member.domain.Member;
 import kr.hhplus.be.server.reservation.domain.Reservation;
@@ -20,10 +21,12 @@ public class Payment extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+    @JsonIgnore
     @JoinColumn(name = "reservation_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;

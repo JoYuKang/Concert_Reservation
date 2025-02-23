@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberJpaRepository extends JpaRepository<Member, Long> {
@@ -15,4 +16,5 @@ public interface MemberJpaRepository extends JpaRepository<Member, Long> {
     @Query("SELECT m FROM Member m WHERE m.id = :id")
     Optional<Member> findMemberWithLock(@Param("id") Long id);
 
+    List<Member> findByName(String name);
 }

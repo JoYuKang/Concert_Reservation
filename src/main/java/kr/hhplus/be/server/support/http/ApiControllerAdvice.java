@@ -51,6 +51,11 @@ public class ApiControllerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(400).body(new ErrorResponse("400", e.getMessage()));
     }
 
+    @ExceptionHandler(value = DuplicateException.class)
+    public ResponseEntity<ErrorResponse> duplicateException(Exception e) {
+        return ResponseEntity.status(400).body(new ErrorResponse("400", e.getMessage()));
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         return ResponseEntity.status(500).body(new ErrorResponse("500", "에러가 발생했습니다."));
