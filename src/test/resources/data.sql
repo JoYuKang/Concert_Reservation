@@ -44,3 +44,7 @@ INSERT INTO tb_seat (concert_id, position, amount, status, reservation_id, versi
 INSERT INTO tb_balance_history (member_id, amount, status, created_at) VALUES
                                                                            (1, 2000, 'USE', NOW()),
                                                                            (2, 2000, 'CHARGE', NOW());
+
+-- tb_payment basic data
+INSERT INTO tb_payment (member_id, reservation_id, amount, status, created_at, updated_at)
+VALUES (8, 2, 50000, 'COMPLETED', NOW(), NOW());
