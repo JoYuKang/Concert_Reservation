@@ -48,6 +48,41 @@ services:
     networks:
       - app_network
 
+  # InfluxDB 추가 (k6 성능 데이터를 저장)
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin123
+    volumes:
+      - influxdb-storage:/var/lib/influxdb
+    networks:
+      - app_network
+
+  # Grafana 추가 (InfluxDB 데이터를 시각화)
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - influxdb
+    networks:
+      - app_network
+
+volumes:
+  influxdb-storage:
+  grafana-storage:
+
 networks:
   app_network:
     driver: bridge
