@@ -31,7 +31,6 @@ public class SeatServiceImpl implements SeatService {
         seatJpaRepository.saveAll(seats);
     }
 
-    @DistributedLockAspect(key = "#concertId + '-' + #seatNumbers")
     @Transactional
     @Override
     public List<Seat> searchSeat(Long concertId, List<Integer> seatNumbers) {

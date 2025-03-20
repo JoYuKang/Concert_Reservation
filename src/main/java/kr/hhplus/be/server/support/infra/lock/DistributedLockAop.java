@@ -12,25 +12,26 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Aspect
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DistributedLockAop {
 
     private final RedissonClient redissonClient;
 
-
     @Around("@annotation(lockAnnotation)")
     public Object around(ProceedingJoinPoint joinPoint, DistributedLockAspect lockAnnotation) throws Throwable {
         // SpEL을 이용해 좌석별 key 리스트 생성
         List<String> lockKeys = generateKeys(joinPoint, lockAnnotation.key());
-
+        log.info("lockKeys: {}", lockKeys);
         // Redisson MultiLock 사용
         List<RLock> locks = lockKeys.stream()
                 .map(redissonClient::getLock)
@@ -61,15 +62,32 @@ public class DistributedLockAop {
         Object[] args = joinPoint.getArgs();
         String[] paramNames = signature.getParameterNames();
 
+        // 메서드 매개변수를 SpEL 컨텍스트에 등록
         for (int i = 0; i < paramNames.length; i++) {
             context.setVariable(paramNames[i], args[i]);
         }
 
-        String rawKey = parser.parseExpression(keyExpression).getValue(context, String.class);
+        // SpEL 표현식 평가
+        Object keyResult = parser.parseExpression(keyExpression).getValue(context);
 
-        // 좌석 목록을 개별 Key로 변환
-        return Arrays.stream(rawKey.split(","))
-                .map(seat -> "concert-" + context.lookupVariable("concertId") + "-seat-" + seat.trim())
-                .collect(Collectors.toList());
+        if (keyResult instanceof String keyString) {
+            // "1-[1, 4]" 같은 문자열이 들어올 수 있으므로 처리
+            String[] parts = keyString.split("-");
+            if (parts.length < 2) {
+                throw new IllegalArgumentException("Invalid key format: " + keyString);
+            }
+
+            String concertId = parts[0].trim();
+            String seatNumbersStr = parts[1].trim();
+
+            // 쉼표로 분리하여 좌석 개별 처리
+            return Arrays.stream(seatNumbersStr.split(","))
+                    .map(String::trim)
+                    .map(seat -> "Seat-" + concertId + "-" + seat)
+                    .toList();
+        }
+
+        throw new IllegalArgumentException("Invalid key expression result: " + keyResult);
+
     }
 }
