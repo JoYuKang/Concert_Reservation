@@ -8,6 +8,7 @@ import kr.hhplus.be.server.seat.domain.SeatStatus;
 import kr.hhplus.be.server.seat.infrastructure.SeatJpaRepository;
 import kr.hhplus.be.server.support.exception.ErrorMessages;
 import kr.hhplus.be.server.support.exception.SeatInvalidException;
+import kr.hhplus.be.server.support.infra.lock.DistributedLockAspect;
 import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
