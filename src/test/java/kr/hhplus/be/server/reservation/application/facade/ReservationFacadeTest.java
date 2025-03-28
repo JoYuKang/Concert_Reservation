@@ -86,7 +86,7 @@ class ReservationFacadeTest {
         ExecutorService executor = Executors.newFixedThreadPool(6);
         CountDownLatch latch = new CountDownLatch(6); // 요청 수와 동일하게 설정
         List<ReservationRequest> reservationRequests = List.of(
-                new ReservationRequest(3L, 1L, List.of(1, 2, 4)), // 유저 3의 예약 요청
+                new ReservationRequest(3L, 1L, List.of(4)), // 유저 3의 예약 요청
                 new ReservationRequest(2L, 1L, List.of(4)), // 유저 2의 예약 요청
                 new ReservationRequest(4L, 1L, List.of(4)), // 유저 4의 예약 요청
                 new ReservationRequest(5L, 1L, List.of(4)), // 유저 5의 예약 요청

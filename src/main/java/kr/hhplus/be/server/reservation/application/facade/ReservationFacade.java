@@ -12,7 +12,6 @@ import kr.hhplus.be.server.seat.domain.Seat;
 import kr.hhplus.be.server.seat.domain.SeatService;
 import kr.hhplus.be.server.support.exception.ErrorMessages;
 import kr.hhplus.be.server.support.exception.SeatInvalidException;
-import kr.hhplus.be.server.support.infra.lock.DistributedLockAspect;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,6 @@ public class ReservationFacade {
     }
 
     // 좌석 예약
-    @DistributedLockAspect(key = "#request.concertId + '-' + #request.seatNumbers")
     @Transactional
     public Reservation createReservation(ReservationRequest request) {
 
