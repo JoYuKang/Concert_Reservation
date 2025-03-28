@@ -10,13 +10,11 @@ import kr.hhplus.be.server.reservation.domain.ReservationService;
 import kr.hhplus.be.server.reservation.interfaces.request.ReservationRequest;
 import kr.hhplus.be.server.seat.domain.Seat;
 import kr.hhplus.be.server.seat.domain.SeatService;
-import kr.hhplus.be.server.support.exception.ErrorMessages;
-import kr.hhplus.be.server.support.exception.SeatInvalidException;
-import kr.hhplus.be.server.support.infra.lock.DistributedLockAspect;
+import kr.hhplus.be.server.support.infra.lock.DistributedLock;
+import kr.hhplus.be.server.support.infra.lock.type.LockType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -40,7 +38,7 @@ public class ReservationFacade {
     }
 
     // 좌석 예약
-    @DistributedLockAspect(key = "#request.concertId + '-' + #request.seatNumbers")
+    @DistributedLock(lockType = LockType.SEAT, key = "#request.concertId + '-' + #request.seatNumbers")
     @Transactional
     public Reservation createReservation(ReservationRequest request) {
 
