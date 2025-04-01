@@ -121,9 +121,6 @@ class ReservationFacadeTest {
         latch.await(); // 모든 스레드가 완료될 때까지 대기
         executor.shutdown();
 
-        // 전체 실행 시간 측정 종료
-        long totalEndTime = System.nanoTime();
-
         // then
         long successfulReservations = reservationRequests.stream()
                 .filter(request -> reservationService.findByMemberId(request.getMemberId()).size() == 1)
@@ -132,17 +129,7 @@ class ReservationFacadeTest {
         // 성공적으로 예약1, 실패 예약 5 확인
         assertThat(successfulReservations).isEqualTo(1);
         assertThat(failCount.get()).isEqualTo(5);
-        // 각 요청의 처리 시간 출력
-        requestTimes.forEach((memberId, time) -> {
-            log.info("Member {} request time: {} ms", memberId, time / 1_000_000);
-        });
 
-        for (long i = 2L; i <= 7L;  i++){
-            List<Reservation> byMemberId = reservationService.findByMemberId(i);
-        }
-
-        // 전체 소요 시간 출력
-        log.info("Total execution time: {} ms", (totalEndTime - totalStartTime) / 1_000_000);
     }
 
 }
